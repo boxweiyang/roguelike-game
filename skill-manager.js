@@ -315,14 +315,18 @@ class SkillManager {
 
   // 执行近战AOE（如死亡旋风）
   executeMeleeAOE(player, enemies, levelData, damage) {
-    const range = levelData.range * 50; // 转换为像素
+    const range = levelData.range * CONFIG.TILE_SIZE; // 转换为像素
     const bladeCount = levelData.blades || 4;
+    
+    // 玩家位置转换为像素坐标
+    const pixelX = player.x * CONFIG.TILE_SIZE;
+    const pixelY = player.y * CONFIG.TILE_SIZE;
 
     // 创建旋风特效
     if (this.skillEffects) {
       this.skillEffects.createWhirlwind(
-        player.x,
-        player.y,
+        pixelX,
+        pixelY,
         range,
         bladeCount,
         2000,
@@ -335,7 +339,7 @@ class SkillManager {
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
 
-      if (dist <= range) {
+      if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
       }
     });
@@ -343,7 +347,7 @@ class SkillManager {
 
   // 执行自动AOE（如雷暴领域）
   executeAutoAOE(player, enemies, levelData, damage) {
-    const range = levelData.range * 50;
+    const range = levelData.range * CONFIG.TILE_SIZE;
     const lightningCount = levelData.lightnings || 1;
 
     // 选择最近的敌人
@@ -355,13 +359,13 @@ class SkillManager {
     );
 
     targets.forEach((target) => {
-      // 创建闪电特效
+      // 创建闪电特效（转换为像素坐标）
       if (this.skillEffects) {
         this.skillEffects.createLightning(
-          player.x,
-          player.y - 30,
-          target.x,
-          target.y,
+          player.x * CONFIG.TILE_SIZE,
+          player.y * CONFIG.TILE_SIZE - 30,
+          target.x * CONFIG.TILE_SIZE,
+          target.y * CONFIG.TILE_SIZE,
           "#00ffff",
           3,
         );
@@ -374,17 +378,19 @@ class SkillManager {
   // 执行AOE投射物（如地狱火雨）
   executeAOEProjectile(player, enemies, levelData, damage) {
     const count = levelData.projectiles || 3;
-    const range = levelData.range * 50;
+    const range = levelData.range * CONFIG.TILE_SIZE;
 
     for (let i = 0; i < count; i++) {
-      // 随机选择目标位置
-      const targetX = player.x + (Math.random() - 0.5) * range * 2;
-      const targetY = player.y + (Math.random() - 0.5) * range * 2;
+      // 随机选择目标位置（像素坐标）
+      const playerPixelX = player.x * CONFIG.TILE_SIZE;
+      const playerPixelY = player.y * CONFIG.TILE_SIZE;
+      const targetX = playerPixelX + (Math.random() - 0.5) * range * 2;
+      const targetY = playerPixelY + (Math.random() - 0.5) * range * 2;
 
       // 添加投射物
       this.projectiles.push({
-        x: player.x,
-        y: player.y - 100,
+        x: playerPixelX,
+        y: playerPixelY - 100,
         targetX: targetX,
         targetY: targetY,
         damage: damage,
@@ -398,7 +404,7 @@ class SkillManager {
   // 执行环绕物（如剑刃风暴）
   executeOrbit(player, enemies, levelData, damage) {
     const bladeCount = levelData.blades || 4;
-    const range = levelData.range * 50;
+    const range = levelData.range * CONFIG.TILE_SIZE;
 
     // 清空旧环绕物
     this.orbitals = [];
@@ -418,32 +424,37 @@ class SkillManager {
   // 执行追踪投射物（如爆裂飞弹）
   executeHomingProjectile(player, enemies, levelData, damage) {
     const count = levelData.missiles || 1;
-    const range = levelData.range * 50;
+    const range = levelData.range * CONFIG.TILE_SIZE;
 
     const targets = this.findNearestEnemies(player, enemies, count, range);
 
     targets.forEach((target) => {
       this.projectiles.push({
-        x: player.x,
-        y: player.y,
+        x: player.x * CONFIG.TILE_SIZE,
+        y: player.y * CONFIG.TILE_SIZE,
         target: target,
         damage: damage,
         type: "missile",
         speed: 4,
         homing: true,
-        explosionRadius: levelData.explosionRadius * 50 || 100,
+        explosionRadius: levelData.explosionRadius * CONFIG.TILE_SIZE || 100,
       });
     });
   }
 
   // 执行控制AOE（如黑洞）
   executeControlAOE(player, enemies, levelData, damage) {
-    const range = levelData.range * 50;
+    const range = levelData.range * CONFIG.TILE_SIZE;
     const duration = levelData.duration || 5000;
 
     // 创建黑洞特效
     if (this.skillEffects) {
-      this.skillEffects.createBlackHole(player.x, player.y, range, duration);
+      this.skillEffects.createBlackHole(
+        player.x * CONFIG.TILE_SIZE,
+        player.y * CONFIG.TILE_SIZE,
+        range,
+        duration
+      );
     }
 
     // 对范围内敌人造成伤害并拉向中心
@@ -452,7 +463,7 @@ class SkillManager {
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
 
-      if (dist <= range) {
+      if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
         // 拉向黑洞中心
         enemy.x += (player.x - enemy.x) * 0.02;
@@ -463,16 +474,16 @@ class SkillManager {
 
   // 执行远程单体（如狙击）
   executeRangedSingle(player, enemies, levelData, damage) {
-    const range = levelData.range * 50;
+    const range = levelData.range * CONFIG.TILE_SIZE;
 
     const target = this.findNearestEnemy(player, enemies, range);
     if (!target) return;
 
     this.projectiles.push({
-      x: player.x,
-      y: player.y,
-      targetX: target.x,
-      targetY: target.y,
+      x: player.x * CONFIG.TILE_SIZE,
+      y: player.y * CONFIG.TILE_SIZE,
+      targetX: target.x * CONFIG.TILE_SIZE,
+      targetY: target.y * CONFIG.TILE_SIZE,
       damage: damage,
       type: "bullet",
       speed: 15,
@@ -483,11 +494,15 @@ class SkillManager {
 
   // 执行AOE控制（如冰霜新星）
   executeAOEControl(player, enemies, levelData, damage) {
-    const range = levelData.range * 50;
+    const range = levelData.range * CONFIG.TILE_SIZE;
 
     // 创建冰霜特效
     if (this.skillEffects) {
-      this.skillEffects.createFrostEffect(player.x, player.y, range);
+      this.skillEffects.createFrostEffect(
+        player.x * CONFIG.TILE_SIZE,
+        player.y * CONFIG.TILE_SIZE,
+        range
+      );
     }
 
     // 对范围内敌人造成伤害并减速
@@ -496,7 +511,7 @@ class SkillManager {
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
 
-      if (dist <= range) {
+      if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
         enemy.slowed = true;
         enemy.slowDuration = levelData.freezeDuration || 2000;
