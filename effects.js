@@ -367,4 +367,4 @@ class EffectSystem {
 const effectSystem = new EffectSystem();
 window.effectSystem = effectSystem;
 
-console.log("状态效果系统初始化完成");
+console.log("状态效果系统加载完成");

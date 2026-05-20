@@ -3943,6 +3943,11 @@ function startGame() {
   if (skillEncyclopedia) {
     skillEncyclopedia.init();
   }
+    
+  // 初始化统计系统（延迟初始化）
+  if (statisticsSystem) {
+    statisticsSystem.init();
+  }
 
   gameState = {
     running: true,

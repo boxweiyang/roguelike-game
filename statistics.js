@@ -47,11 +47,23 @@ class StatisticsSystem {
     this.damageLog = [];
     this.killTimeline = [];
     this.levelTimeline = [];
-
-    this.init();
+    
+    this.initialized = false;
+    // 不立即初始化，等待persistentData可用
   }
 
+  // 延迟初始化
   init() {
+    if (this.initialized) return;
+    
+    // 检查persistentData是否可用
+    if (typeof persistentData === 'undefined') {
+      console.warn('统计系统: persistentData 未定义，延迟初始化');
+      return;
+    }
+    
+    this.initialized = true;
+    
     // 从持久化数据加载历史统计
     if (!persistentData.allTimeStats) {
       persistentData.allTimeStats = {
@@ -67,6 +79,8 @@ class StatisticsSystem {
         achievementsUnlocked: 0,
       };
     }
+    
+    console.log('数据统计系统初始化完成');
   }
 
   // 记录伤害
@@ -484,16 +498,18 @@ class StatisticsSystem {
   }
 }
 
-// 创建全局实例
+// 创建全局实例（不立即初始化）
 const statisticsSystem = new StatisticsSystem();
 window.statisticsSystem = statisticsSystem;
 
-// 快捷键打开统计面板
+// 快捷键打开统计面板（需要检查gameState是否可用）
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Tab" && gameState && gameState.running) {
+  if (e.key === "Tab" && typeof gameState !== 'undefined' && gameState && gameState.running) {
     e.preventDefault();
-    statisticsSystem.showStatisticsPanel();
+    if (statisticsSystem.initialized) {
+      statisticsSystem.showStatisticsPanel();
+    }
   }
 });
 
-console.log("数据统计系统初始化完成");
+console.log("数据统计系统加载完成（等待persistentData初始化）");

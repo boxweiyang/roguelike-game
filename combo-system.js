@@ -323,4 +323,4 @@ document.head.appendChild(comboStyle);
 const comboSystem = new ComboSystem();
 window.comboSystem = comboSystem;
 
-console.log("连击评分系统初始化完成");
+console.log("连击评分系统加载完成");

@@ -3,51 +3,51 @@
 // ============================================
 
 class SkillEncyclopedia {
-    constructor() {
-        this.discoveredSkills = {}; // 已发现的技能
-        this.discoveredEvolutions = {}; // 已解锁的进化配方
-        this.discoveredPassives = {}; // 已发现的被动道具
-        this.initialized = false;
-        // 不立即初始化，等待persistentData可用
+  constructor() {
+    this.discoveredSkills = {}; // 已发现的技能
+    this.discoveredEvolutions = {}; // 已解锁的进化配方
+    this.discoveredPassives = {}; // 已发现的被动道具
+    this.initialized = false;
+    // 不立即初始化，等待persistentData可用
+  }
+
+  // 延迟初始化，在persistentData可用后调用
+  init() {
+    if (this.initialized) return;
+
+    // 检查persistentData是否可用
+    if (typeof persistentData === "undefined") {
+      console.warn("图鉴系统: persistentData 未定义，延迟初始化");
+      return;
     }
 
-    // 延迟初始化，在persistentData可用后调用
-    init() {
-        if (this.initialized) return;
-        
-        // 检查persistentData是否可用
-        if (typeof persistentData === 'undefined') {
-            console.warn('图鉴系统: persistentData 未定义，延迟初始化');
-            return;
-        }
-        
-        this.initialized = true;
-        
-        // 从持久化数据加载
-        if (!persistentData.encyclopedia) {
-            persistentData.encyclopedia = {
-                skills: {},
-                evolutions: {},
-                passives: {}
-            };
-        }
-        
-        this.discoveredSkills = persistentData.encyclopedia.skills || {};
-        this.discoveredEvolutions = persistentData.encyclopedia.evolutions || {};
-        this.discoveredPassives = persistentData.encyclopedia.passives || {};
+    this.initialized = true;
 
-        // 创建图鉴UI
-        this.createEncyclopediaUI();
-        console.log('技能图鉴系统初始化完成');
+    // 从持久化数据加载
+    if (!persistentData.encyclopedia) {
+      persistentData.encyclopedia = {
+        skills: {},
+        evolutions: {},
+        passives: {},
+      };
     }
 
-    // 创建图鉴界面
-    createEncyclopediaUI() {
-        // 创建图鉴按钮
-        const encyclopediaBtn = document.createElement('button');
-        encyclopediaBtn.id = 'encyclopedia-btn';
-        encyclopediaBtn.innerHTML = '📖 图鉴';
-        encyclopediaBtn.style.cssText = `
+    this.discoveredSkills = persistentData.encyclopedia.skills || {};
+    this.discoveredEvolutions = persistentData.encyclopedia.evolutions || {};
+    this.discoveredPassives = persistentData.encyclopedia.passives || {};
+
+    // 创建图鉴UI
+    this.createEncyclopediaUI();
+    console.log("技能图鉴系统初始化完成");
+  }
+
+  // 创建图鉴界面
+  createEncyclopediaUI() {
+    // 创建图鉴按钮
+    const encyclopediaBtn = document.createElement("button");
+    encyclopediaBtn.id = "encyclopedia-btn";
+    encyclopediaBtn.innerHTML = "📖 图鉴";
+    encyclopediaBtn.style.cssText = `
             position: fixed;
             top: 10px;
             right: 10px;
@@ -62,13 +62,13 @@ class SkillEncyclopedia {
             z-index: 1000;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         `;
-        encyclopediaBtn.onclick = () => this.showEncyclopedia();
-        document.body.appendChild(encyclopediaBtn);
+    encyclopediaBtn.onclick = () => this.showEncyclopedia();
+    document.body.appendChild(encyclopediaBtn);
 
-        // 创建图鉴面板
-        const panel = document.createElement('div');
-        panel.id = 'encyclopedia-panel';
-        panel.style.cssText = `
+    // 创建图鉴面板
+    const panel = document.createElement("div");
+    panel.id = "encyclopedia-panel";
+    panel.style.cssText = `
             position: fixed;
             top: 50%;
             left: 50%;
@@ -84,12 +84,12 @@ class SkillEncyclopedia {
             display: none;
             box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 30px rgba(102,126,234,0.3);
         `;
-        document.body.appendChild(panel);
+    document.body.appendChild(panel);
 
-        // 关闭按钮
-        const closeBtn = document.createElement('button');
-        closeBtn.innerHTML = '✖';
-        closeBtn.style.cssText = `
+    // 关闭按钮
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "✖";
+    closeBtn.style.cssText = `
             position: absolute;
             top: 15px;
             right: 15px;
@@ -103,33 +103,33 @@ class SkillEncyclopedia {
             font-size: 18px;
             font-weight: bold;
         `;
-        closeBtn.onclick = () => this.hideEncyclopedia();
-        panel.appendChild(closeBtn);
+    closeBtn.onclick = () => this.hideEncyclopedia();
+    panel.appendChild(closeBtn);
+  }
+
+  // 显示图鉴
+  showEncyclopedia() {
+    const panel = document.getElementById("encyclopedia-panel");
+    if (!panel) return;
+
+    this.renderEncyclopediaContent();
+    panel.style.display = "block";
+  }
+
+  // 隐藏图鉴
+  hideEncyclopedia() {
+    const panel = document.getElementById("encyclopedia-panel");
+    if (panel) {
+      panel.style.display = "none";
     }
+  }
 
-    // 显示图鉴
-    showEncyclopedia() {
-        const panel = document.getElementById('encyclopedia-panel');
-        if (!panel) return;
+  // 渲染图鉴内容
+  renderEncyclopediaContent() {
+    const panel = document.getElementById("encyclopedia-panel");
+    if (!panel) return;
 
-        this.renderEncyclopediaContent();
-        panel.style.display = 'block';
-    }
-
-    // 隐藏图鉴
-    hideEncyclopedia() {
-        const panel = document.getElementById('encyclopedia-panel');
-        if (panel) {
-            panel.style.display = 'none';
-        }
-    }
-
-    // 渲染图鉴内容
-    renderEncyclopediaContent() {
-        const panel = document.getElementById('encyclopedia-panel');
-        if (!panel) return;
-
-        let html = `
+    let html = `
             <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">
                 📖 技能图鉴
             </h2>
@@ -150,47 +150,48 @@ class SkillEncyclopedia {
             </div>
         `;
 
-        html += `<div id="encyclopedia-content"></div>`;
-        panel.innerHTML = html;
-        panel.querySelector('button:last-of-type').after(
-            document.createElement('div')
-        );
+    html += `<div id="encyclopedia-content"></div>`;
+    panel.innerHTML = html;
+    panel
+      .querySelector("button:last-of-type")
+      .after(document.createElement("div"));
 
-        // 默认显示技能列表
-        this.showTab('skills');
+    // 默认显示技能列表
+    this.showTab("skills");
+  }
+
+  // 切换标签
+  showTab(tabName) {
+    const content = document.getElementById("encyclopedia-content");
+    if (!content) return;
+
+    switch (tabName) {
+      case "skills":
+        this.renderSkillsTab(content);
+        break;
+      case "evolutions":
+        this.renderEvolutionsTab(content);
+        break;
+      case "passives":
+        this.renderPassivesTab(content);
+        break;
     }
+  }
 
-    // 切换标签
-    showTab(tabName) {
-        const content = document.getElementById('encyclopedia-content');
-        if (!content) return;
+  // 渲染技能列表
+  renderSkillsTab(container) {
+    const skillIds = Object.keys(SKILLS_DATA);
 
-        switch (tabName) {
-            case 'skills':
-                this.renderSkillsTab(content);
-                break;
-            case 'evolutions':
-                this.renderEvolutionsTab(content);
-                break;
-            case 'passives':
-                this.renderPassivesTab(content);
-                break;
-        }
-    }
+    let html =
+      '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">';
 
-    // 渲染技能列表
-    renderSkillsTab(container) {
-        const skillIds = Object.keys(SKILLS_DATA);
-        
-        let html = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">';
+    skillIds.forEach((skillId) => {
+      const skill = SKILLS_DATA[skillId];
+      const discovered = this.discoveredSkills[skillId];
 
-        skillIds.forEach(skillId => {
-            const skill = SKILLS_DATA[skillId];
-            const discovered = this.discoveredSkills[skillId];
-            
-            if (discovered) {
-                // 已发现的技能
-                html += `
+      if (discovered) {
+        // 已发现的技能
+        html += `
                     <div style="
                         background: rgba(102,126,234,0.1);
                         border: 1px solid #667eea;
@@ -214,9 +215,9 @@ class SkillEncyclopedia {
                         </div>
                     </div>
                 `;
-            } else {
-                // 未发现的技能
-                html += `
+      } else {
+        // 未发现的技能
+        html += `
                     <div style="
                         background: rgba(100,100,100,0.1);
                         border: 1px solid #555;
@@ -235,19 +236,19 @@ class SkillEncyclopedia {
                         </div>
                     </div>
                 `;
-            }
-        });
+      }
+    });
 
-        html += '</div>';
-        container.innerHTML = html;
-    }
+    html += "</div>";
+    container.innerHTML = html;
+  }
 
-    // 渲染进化配方
-    renderEvolutionsTab(container) {
-        const evolutionIds = Object.keys(this.discoveredEvolutions);
-        
-        if (evolutionIds.length === 0) {
-            container.innerHTML = `
+  // 渲染进化配方
+  renderEvolutionsTab(container) {
+    const evolutionIds = Object.keys(this.discoveredEvolutions);
+
+    if (evolutionIds.length === 0) {
+      container.innerHTML = `
                 <div style="text-align: center; color: #888; padding: 50px;">
                     <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
                     <div style="font-size: 18px;">尚未解锁任何进化配方</div>
@@ -256,15 +257,16 @@ class SkillEncyclopedia {
                     </div>
                 </div>
             `;
-            return;
-        }
+      return;
+    }
 
-        let html = '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">';
+    let html =
+      '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">';
 
-        evolutionIds.forEach(evoId => {
-            const evolution = this.discoveredEvolutions[evoId];
-            
-            html += `
+    evolutionIds.forEach((evoId) => {
+      const evolution = this.discoveredEvolutions[evoId];
+
+      html += `
                 <div style="
                     background: rgba(243,156,18,0.1);
                     border: 2px solid #f39c12;
@@ -309,24 +311,25 @@ class SkillEncyclopedia {
                     </div>
                 </div>
             `;
-        });
+    });
 
-        html += '</div>';
-        container.innerHTML = html;
-    }
+    html += "</div>";
+    container.innerHTML = html;
+  }
 
-    // 渲染被动道具
-    renderPassivesTab(container) {
-        const passiveIds = Object.keys(PASSIVE_ITEMS);
-        
-        let html = '<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">';
+  // 渲染被动道具
+  renderPassivesTab(container) {
+    const passiveIds = Object.keys(PASSIVE_ITEMS);
 
-        passiveIds.forEach(passiveId => {
-            const passive = PASSIVE_ITEMS[passiveId];
-            const discovered = this.discoveredPassives[passiveId];
-            
-            if (discovered) {
-                html += `
+    let html =
+      '<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">';
+
+    passiveIds.forEach((passiveId) => {
+      const passive = PASSIVE_ITEMS[passiveId];
+      const discovered = this.discoveredPassives[passiveId];
+
+      if (discovered) {
+        html += `
                     <div style="
                         background: rgba(243,156,18,0.1);
                         border: 1px solid #f39c12;
@@ -347,8 +350,8 @@ class SkillEncyclopedia {
                         </div>
                     </div>
                 `;
-            } else {
-                html += `
+      } else {
+        html += `
                     <div style="
                         background: rgba(100,100,100,0.1);
                         border: 1px solid #555;
@@ -364,115 +367,115 @@ class SkillEncyclopedia {
                         </div>
                     </div>
                 `;
-            }
-        });
+      }
+    });
 
-        html += '</div>';
-        container.innerHTML = html;
-    }
+    html += "</div>";
+    container.innerHTML = html;
+  }
 
-    // 发现技能
-    discoverSkill(skillId) {
-        if (!this.discoveredSkills[skillId]) {
-            this.discoveredSkills[skillId] = true;
-            this.saveEncyclopedia();
-            
-            // 显示提示
-            if (notificationSystem) {
-                const skill = SKILLS_DATA[skillId];
-                notificationSystem.showNotification(
-                    '📖 新技能发现！',
-                    `${skill.icon} ${skill.name}`,
-                    { color: '#667eea', duration: 3000 }
-                );
-            }
-        }
-    }
+  // 发现技能
+  discoverSkill(skillId) {
+    if (!this.discoveredSkills[skillId]) {
+      this.discoveredSkills[skillId] = true;
+      this.saveEncyclopedia();
 
-    // 解锁进化配方
-    unlockEvolution(skillId, passiveId, evolutionId) {
-        const evolutionKey = `${skillId}_${passiveId}`;
-        
-        if (!this.discoveredEvolutions[evolutionKey]) {
-            const skill = SKILLS_DATA[skillId];
-            const passive = PASSIVE_ITEMS[passiveId];
-            const evolution = skill.evolution;
-            
-            this.discoveredEvolutions[evolutionKey] = {
-                skillId: skillId,
-                skillName: skill.name,
-                skillIcon: skill.icon,
-                passiveId: passiveId,
-                passiveName: passive.name,
-                passiveIcon: passive.icon,
-                evolvedId: evolutionId,
-                evolvedName: evolution.name,
-                evolvedIcon: evolution.icon
-            };
-            
-            this.saveEncyclopedia();
-            
-            // 显示提示
-            if (notificationSystem) {
-                notificationSystem.showNotification(
-                    '🔓 进化配方解锁！',
-                    `${skill.icon} + ${passive.icon} = ${evolution.icon}`,
-                    { color: '#f39c12', duration: 5000 }
-                );
-            }
-        }
+      // 显示提示
+      if (notificationSystem) {
+        const skill = SKILLS_DATA[skillId];
+        notificationSystem.showNotification(
+          "📖 新技能发现！",
+          `${skill.icon} ${skill.name}`,
+          { color: "#667eea", duration: 3000 },
+        );
+      }
     }
+  }
 
-    // 发现被动道具
-    discoverPassive(passiveId) {
-        if (!this.discoveredPassives[passiveId]) {
-            this.discoveredPassives[passiveId] = true;
-            this.saveEncyclopedia();
-        }
-    }
+  // 解锁进化配方
+  unlockEvolution(skillId, passiveId, evolutionId) {
+    const evolutionKey = `${skillId}_${passiveId}`;
 
-    // 保存图鉴数据
-    saveEncyclopedia() {
-        persistentData.encyclopedia = {
-            skills: this.discoveredSkills,
-            evolutions: this.discoveredEvolutions,
-            passives: this.discoveredPassives
-        };
-        
-        if (typeof saveGame === 'function') {
-            saveGame();
-        }
-    }
+    if (!this.discoveredEvolutions[evolutionKey]) {
+      const skill = SKILLS_DATA[skillId];
+      const passive = PASSIVE_ITEMS[passiveId];
+      const evolution = skill.evolution;
 
-    // 获取稀有度颜色
-    getRarityColor(rarity) {
-        const colors = {
-            common: '#95a5a6',
-            uncommon: '#2ecc71',
-            rare: '#3498db',
-            epic: '#9b59b6',
-            legendary: '#f39c12',
-            mythic: '#e74c3c'
-        };
-        return colors[rarity] || '#ffffff';
-    }
+      this.discoveredEvolutions[evolutionKey] = {
+        skillId: skillId,
+        skillName: skill.name,
+        skillIcon: skill.icon,
+        passiveId: passiveId,
+        passiveName: passive.name,
+        passiveIcon: passive.icon,
+        evolvedId: evolutionId,
+        evolvedName: evolution.name,
+        evolvedIcon: evolution.icon,
+      };
 
-    // 获取稀有度名称
-    getRarityName(rarity) {
-        const names = {
-            common: '普通',
-            uncommon: '优秀',
-            rare: '稀有',
-            epic: '史诗',
-            legendary: '传说',
-            mythic: '神话'
-        };
-        return names[rarity] || '未知';
+      this.saveEncyclopedia();
+
+      // 显示提示
+      if (notificationSystem) {
+        notificationSystem.showNotification(
+          "🔓 进化配方解锁！",
+          `${skill.icon} + ${passive.icon} = ${evolution.icon}`,
+          { color: "#f39c12", duration: 5000 },
+        );
+      }
     }
+  }
+
+  // 发现被动道具
+  discoverPassive(passiveId) {
+    if (!this.discoveredPassives[passiveId]) {
+      this.discoveredPassives[passiveId] = true;
+      this.saveEncyclopedia();
+    }
+  }
+
+  // 保存图鉴数据
+  saveEncyclopedia() {
+    persistentData.encyclopedia = {
+      skills: this.discoveredSkills,
+      evolutions: this.discoveredEvolutions,
+      passives: this.discoveredPassives,
+    };
+
+    if (typeof saveGame === "function") {
+      saveGame();
+    }
+  }
+
+  // 获取稀有度颜色
+  getRarityColor(rarity) {
+    const colors = {
+      common: "#95a5a6",
+      uncommon: "#2ecc71",
+      rare: "#3498db",
+      epic: "#9b59b6",
+      legendary: "#f39c12",
+      mythic: "#e74c3c",
+    };
+    return colors[rarity] || "#ffffff";
+  }
+
+  // 获取稀有度名称
+  getRarityName(rarity) {
+    const names = {
+      common: "普通",
+      uncommon: "优秀",
+      rare: "稀有",
+      epic: "史诗",
+      legendary: "传说",
+      mythic: "神话",
+    };
+    return names[rarity] || "未知";
+  }
 }
 
 // 创建全局实例（不立即初始化）
 const skillEncyclopedia = new SkillEncyclopedia();
 window.skillEncyclopedia = skillEncyclopedia;
 
-console.log('技能图鉴系统加载完成（等待persistentData初始化）');
+console.log("技能图鉴系统加载完成（等待persistentData初始化）");
