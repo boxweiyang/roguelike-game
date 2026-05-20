@@ -1749,12 +1749,36 @@ function showLevelUpChoices() {
   gameState.paused = true;
   gameState.levelUpChoices = [];
 
-  const p = gameState.player; // 添加这行
+  const p = gameState.player;
   const modal = document.getElementById("level-up-modal");
   const container = document.getElementById("card-container");
   container.innerHTML = "";
 
-  const pool = [...UPGRADE_CARDS];
+  // 创建新技能卡池
+  const pool = [];
+  
+  // 添加新技能
+  Object.keys(SKILLS_DATA).forEach(skillId => {
+    pool.push({
+      id: skillId,
+      type: 'skill',
+      ...SKILLS_DATA[skillId]
+    });
+  });
+  
+  // 添加被动道具
+  Object.keys(PASSIVE_ITEMS).forEach(passiveId => {
+    pool.push({
+      id: passiveId,
+      type: 'passive',
+      ...PASSIVE_ITEMS[passiveId]
+    });
+  });
+  
+  // 添加旧属性卡
+  const oldStatCards = UPGRADE_CARDS.filter(c => c.type === 'stat' || c.type === 'special');
+  pool.push(...oldStatCards);
+
   const choices = [];
 
   while (choices.length < CONFIG.LEVEL.CARD_CHOICES && pool.length > 0) {
@@ -1772,54 +1796,91 @@ function showLevelUpChoices() {
     div.className = "skill-card";
     div.dataset.index = i + 1;
 
-    const ownedSkillIds = gameState.player.skills
-      .filter((s) => s.type !== "stat" && s.type !== "special")
-      .map((s) => s.id);
     const existing = p.skills.find((s) => s.id === card.id);
     const owned = !!existing;
     const currentLevel = existing ? existing.level : 0;
     const nextLevel = currentLevel + 1;
 
     // 构建详细描述
-    let descHtml = card.description;
+    let descHtml = card.description || '';
     let statsHtml = "";
     let nextHtml = "";
+    let evolutionHtml = "";
 
-    if (owned && SKILLS[card.id]) {
+    if (owned && SKILLS_DATA[card.id]) {
       // 已有技能 - 显示升级信息
-      const baseSkill = SKILLS[card.id];
-      const currentDmg = existing.damage;
-      const nextDmg = Math.floor(currentDmg * 1.25);
-      const currentRange = existing.range || baseSkill.range;
-      const nextRange = (currentRange * 1.1).toFixed(1);
+      const skillData = SKILLS_DATA[card.id];
+      const levelData = skillData.levels[currentLevel - 1];
+      const nextLevelData = skillData.levels[currentLevel];
 
-      statsHtml = `<div class="card-stats">当前 Lv.${currentLevel} | 伤害: ${currentDmg} | 范围: ${currentRange}</div>`;
-      nextHtml = `<div class="card-next">➤ 升级到 Lv.${nextLevel}: 伤害 ${nextDmg}, 范围 ${nextRange}</div>`;
+      if (levelData && nextLevelData) {
+        statsHtml = `<div class="card-stats">当前 Lv.${currentLevel} | 伤害: ${levelData.damage}</div>`;
+        nextHtml = `<div class="card-next">➤ 升级到 Lv.${nextLevel}: 伤害 ${nextLevelData.damage}</div>`;
+      }
 
-      // 检查是否接近进化等级
-      const evoData = SKILL_EVOLUTION[card.id];
-      if (evoData) {
-        const nextEvo = evoData.evolutions.find((e) => e.level > currentLevel);
-        if (nextEvo) {
-          nextHtml += `<div class="card-next" style="color: #ff69b4;">★ 进化在 Lv.${nextEvo.level} - 还差 ${nextEvo.level - nextLevel} 级</div>`;
-        }
+      // 检查是否可以进化
+      if (skillManager && skillManager.canEvolve(card.id)) {
+        const evo = skillData.evolution;
+        evolutionHtml = `<div class="card-next" style="color: #ff69b4; font-weight: bold;">★ 点击进化为 ${evo.icon} ${evo.name}！</div>`;
+      } else if (currentLevel === 8 && skillData.evolution) {
+        const evo = skillData.evolution;
+        evolutionHtml = `<div class="card-next" style="color: #888;">🔒 需要被动: ${PASSIVE_ITEMS[skillData.evolution.requiredPassive]?.icon || ''}</div>`;
       }
     } else if (!owned && card.type === "skill") {
-      // 新技能 - 显示基础信息
-      statsHtml = `<div class="card-stats">伤害: ${card.damage} | 冷却: ${(card.cooldown / 1000).toFixed(1)}s | 范围: ${card.range || "-"}</div>`;
-      nextHtml = `<div class="card-next">➤ 获得技能，从 Lv.1 开始</div>`;
+      // 新技能
+      const skillData = SKILLS_DATA[card.id];
+      if (skillData && skillData.levels && skillData.levels[0]) {
+        const level1 = skillData.levels[0];
+        statsHtml = `<div class="card-stats">伤害: ${level1.damage} | 范围: ${level1.range || '-'} | 稀有度: ${skillData.rarity}</div>`;
+        nextHtml = `<div class="card-next">➤ 获得技能，从 Lv.1 开始</div>`;
+      }
+    } else if (card.type === "passive") {
+      // 被动道具
+      statsHtml = `<div class="card-stats">${card.description}</div>`;
+      nextHtml = `<div class="card-next">➤ 获得被动增强</div>`;
+      
+      // 显示进化配方
+      if (card.evolutionRecipe) {
+        const recipes = Object.entries(card.evolutionRecipe);
+        evolutionHtml = recipes.map(([skillId, evoId]) => {
+          const skill = SKILLS_DATA[skillId];
+          const evo = skill?.evolution;
+          return `<div class="card-next" style="color: #f39c12; font-size: 11px;">${skill?.icon} ${skill?.name} Lv.8 + ${card.icon} = ${evo?.icon} ${evo?.name}</div>`;
+        }).join('');
+      }
     }
 
+    const cardTypeLabel = card.type === "skill" ? 
+      (owned ? "🔼 技能升级" : "✨ 新技能") : 
+      card.type === "passive" ? "🎁 被动道具" : 
+      card.type === "stat" ? "💪 属性强化" : "⭐ 特殊能力";
+
     div.innerHTML = `
-            <div class="card-number">${i + 1}</div>
-            <div class="card-icon">${card.icon}</div>
-            <div class="card-name">${card.name} ${owned ? `<span style="color:#9b59b6;">Lv.${currentLevel}</span>` : ""}</div>
-            <div class="card-desc">${descHtml}</div>
-            ${statsHtml}
-            ${nextHtml}
-            <div class="card-type">${card.type === "skill" ? (owned ? "🔼 技能升级" : "✨ 新技能") : card.type === "stat" ? "💪 属性强化" : "⭐ 特殊能力"}</div>
-        `;
-    div.onclick = () => selectUpgrade(card);
+      <div class="card-number">${i + 1}</div>
+      <div class="card-icon">${card.icon}</div>
+      <div class="card-name">${card.name} ${owned ? `<span style="color:#9b59b6;">Lv.${currentLevel}</span>` : ""}</div>
+      <div class="card-desc">${descHtml}</div>
+      ${statsHtml}
+      ${nextHtml}
+      ${evolutionHtml}
+      <div class="card-type">${cardTypeLabel}</div>
+    `;
+    
+    // 检查进化
+    if (owned && skillManager && skillManager.canEvolve(card.id)) {
+      div.onclick = () => {
+        if (skillManager.evolveSkill(card.id)) {
+          const evo = SKILLS_DATA[card.id].evolution;
+          addLog(`🎉 ${card.name} 进化为 ${evo.icon} ${evo.name}！`, "legendary");
+        }
+        document.getElementById("level-up-modal").classList.remove("show");
+        gameState.paused = false;
+        updateUI();
+      };
+    } else {
+      div.onclick = () => selectUpgrade(card);
+    }
+    
     container.appendChild(div);
   }
 
@@ -1839,71 +1900,54 @@ function selectUpgrade(card) {
     return;
   }
 
-  console.log(
-    "当前技能列表:",
-    p.skills.map((s) => s.id),
-  );
+  // 检查是否是新技能系统
+  const isNewSkill = SKILLS_DATA[card.id] !== undefined;
+  const isPassive = PASSIVE_ITEMS[card.id] !== undefined;
 
-  // 检查是否是技能（type 包含 skill 或者是 SKILLS 中定义的技能类型）
-  const isSkill = card.type === "skill" || SKILLS[card.id];
-  console.log("是否为技能类型:", isSkill);
-
-  if (isSkill) {
+  if (isNewSkill) {
+    // 使用新技能系统
     const existing = p.skills.find((s) => s.id === card.id);
-    console.log("现有技能:", existing ? existing.id : "新技能");
-
+    
     if (existing) {
-      existing.level++;
-      existing.damage = Math.floor(existing.damage * 1.25);
-      if (existing.range) existing.range *= 1.1;
-      if (existing.count) existing.count += 1;
-      if (existing.radius) existing.radius += 0.3;
-      addLog(`${card.icon} ${card.name} -> Lv.${existing.level}`, "success");
-      if (card.id === "orbit") gameState.orbitals = [];
-      console.log(
-        "技能升级:",
-        card.name,
-        "等级:",
-        existing.level,
-        "cooldown:",
-        existing.cooldown,
-      );
-
-      // 记录技能升级统计
-      if (statisticsSystem) {
-        statisticsSystem.recordLevelUp(p.level, card.id);
+      // 升级技能
+      if (skillManager) {
+        const success = skillManager.upgradeSkill(card.id);
+        if (success) {
+          addLog(`${card.icon} ${card.name} -> Lv.${existing.level + 1}`, "success");
+          
+          // 检查进化
+          if (skillManager.canEvolve(card.id)) {
+            addLog(`⭐ ${card.name} 可以进化！`, "legendary");
+          }
+        }
       }
-
-      // 检查是否触发进化
-      checkSkillEvolution(existing);
     } else {
-      const newSkill = { ...card, level: 1, timer: 0 };
-      console.log("创建新技能对象:", newSkill);
-      p.skills.push(newSkill);
-      addLog(`获得技能: ${card.icon} ${card.name}`, "success");
-      if (card.id === "orbit") gameState.orbitals = [];
-      console.log(
-        "获得新技能:",
-        card.name,
-        "cooldown:",
-        newSkill.cooldown,
-        "type:",
-        newSkill.type,
-      );
-      console.log(
-        "更新后技能列表:",
-        p.skills.map((s) => ({ id: s.id, name: s.name, cooldown: s.cooldown })),
-      );
-
-      // 记录技能获得统计
-      if (statisticsSystem) {
-        statisticsSystem.recordLevelUp(p.level, card.id);
+      // 获得新技能
+      if (skillManager) {
+        const success = skillManager.addSkill(card.id);
+        if (success) {
+          addLog(`获得技能: ${card.icon} ${card.name}`, "success");
+        }
       }
-
-      // 更新任务进度 - 技能获取
-      updateQuestProgress("daily_use_3_skills", p.skills.length >= 3 ? 1 : 0);
+    }
+  } else if (isPassive) {
+    // 获得被动道具
+    if (skillManager) {
+      const success = skillManager.addPassiveItem(card.id);
+      if (success) {
+        addLog(`获得被动: ${card.icon} ${card.name}`, "info");
+        
+        // 检查是否有技能可以进化
+        Object.keys(SKILLS_DATA).forEach(skillId => {
+          if (skillManager.canEvolve(skillId)) {
+            const skillData = SKILLS_DATA[skillId];
+            addLog(`⭐ ${skillData.name} 可以进化为 ${skillData.evolution.name}！`, "legendary");
+          }
+        });
+      }
     }
   } else {
+    // 旧系统 - 属性强化
     console.log("非技能卡牌，类型:", card.type);
     if (card.effect && gameState.playerStats) {
       gameState.playerStats.applyStat(card.effect);
@@ -3220,6 +3264,11 @@ function render() {
   }
   ctx.globalAlpha = 1;
 
+  // 渲染新技能特效
+  if (skillManager) {
+    skillManager.render();
+  }
+
   renderMinimap();
 }
 
@@ -3748,6 +3797,12 @@ function gameLoop(timestamp) {
     }
 
     updatePlayer(dt);
+    
+    // 更新新技能系统
+    if (skillManager) {
+      skillManager.update(gameState.player, gameState.enemies);
+    }
+    
     updateSkills(dt);
     updateEntities(dt);
     updateSearchPoints(dt);
@@ -3848,6 +3903,14 @@ function startGame() {
     comboSystem.startGame();
   }
 
+  // 初始化技能管理器（新系统）
+  if (skillManager) {
+    const gameCanvas = document.getElementById('game-canvas');
+    if (gameCanvas) {
+      skillManager.init(gameCanvas, ctx);
+    }
+  }
+
   gameState = {
     running: true,
     paused: false,
@@ -3888,11 +3951,12 @@ function startGame() {
   spawnChest();
 
   requestAnimationFrame(gameLoop);
-  addLog("欢迎来到深渊撤离区 v4.0!", "info");
+  addLog("欢迎来到深渊撤离区 v7.0 - 割草体验重制版!", "info");
   addLog("WASD移动, 自动攻击", "info");
   addLog("消灭敌人获取经验、金币和装备", "info");
   addLog("点击背包中的装备进行装备", "info");
   addLog("左侧面板查看属性和装备", "info");
+  addLog("右上角📖按钮查看技能图鉴", "info");
 }
 
 function gameOver() {
