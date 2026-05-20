@@ -264,7 +264,7 @@ const ENEMY_TYPES = {
     gold: 15,
     size: 0.8,
     color: "#9b59b6",
-    ability: 'phase', // 可以穿过敌人
+    ability: "phase", // 可以穿过敌人
   },
   spider: {
     name: "毒蛛",
@@ -276,7 +276,7 @@ const ENEMY_TYPES = {
     gold: 12,
     size: 0.6,
     color: "#2c3e50",
-    ability: 'poison', // 攻击附带中毒
+    ability: "poison", // 攻击附带中毒
   },
   mage: {
     name: "暗黑法师",
@@ -288,7 +288,7 @@ const ENEMY_TYPES = {
     gold: 25,
     size: 0.8,
     color: "#8e44ad",
-    ability: 'ranged', // 远程攻击
+    ability: "ranged", // 远程攻击
   },
   assassin: {
     name: "暗影刺客",
@@ -300,7 +300,7 @@ const ENEMY_TYPES = {
     gold: 22,
     size: 0.7,
     color: "#34495e",
-    ability: 'blink', // 可以瞬移
+    ability: "blink", // 可以瞬移
   },
   tank: {
     name: "重装战士",
@@ -312,7 +312,7 @@ const ENEMY_TYPES = {
     gold: 35,
     size: 1.2,
     color: "#7f8c8d",
-    ability: 'armor', // 高护甲
+    ability: "armor", // 高护甲
   },
   // 精英敌人（带词缀）
   elite_vampire: {
@@ -326,7 +326,7 @@ const ENEMY_TYPES = {
     size: 1.0,
     color: "#c0392b",
     isElite: true,
-    affixes: ['life_steal'], // 吸血
+    affixes: ["life_steal"], // 吸血
   },
   elite_explosive: {
     name: "自爆精英",
@@ -339,7 +339,7 @@ const ENEMY_TYPES = {
     size: 0.9,
     color: "#e67e22",
     isElite: true,
-    affixes: ['explosive'], // 死亡爆炸
+    affixes: ["explosive"], // 死亡爆炸
   },
   elite_shield: {
     name: "护盾精英",
@@ -352,7 +352,7 @@ const ENEMY_TYPES = {
     size: 1.1,
     color: "#3498db",
     isElite: true,
-    affixes: ['shield'], // 有护盾
+    affixes: ["shield"], // 有护盾
   },
 };
 
@@ -1555,7 +1555,7 @@ function updatePlayer(dt) {
 
   // 检查是否可以移动（眩晕/冰冻状态）
   const canMove = effectSystem ? effectSystem.canMove(p) : true;
-  
+
   if (canMove && (dx !== 0 || dy !== 0)) {
     const len = Math.sqrt(dx * dx + dy * dy);
     dx /= len;
@@ -1563,8 +1563,16 @@ function updatePlayer(dt) {
 
     // 应用速度修正
     const speedModifier = effectSystem ? effectSystem.getSpeedModifier(p) : 1.0;
-    p.x = clamp(p.x + dx * stats.moveSpeed * speedModifier * dt, 1, CONFIG.ARENA_SIZE - 1);
-    p.y = clamp(p.y + dy * stats.moveSpeed * speedModifier * dt, 1, CONFIG.ARENA_SIZE - 1);
+    p.x = clamp(
+      p.x + dx * stats.moveSpeed * speedModifier * dt,
+      1,
+      CONFIG.ARENA_SIZE - 1,
+    );
+    p.y = clamp(
+      p.y + dy * stats.moveSpeed * speedModifier * dt,
+      1,
+      CONFIG.ARENA_SIZE - 1,
+    );
   }
 
   autoPickup();
@@ -2206,7 +2214,7 @@ function killEnemy(enemy) {
   if (comboSystem) {
     comboSystem.recordKill(enemy.x, enemy.y);
   }
-  
+
   // 更新挑战进度
   if (eventSystem && eventSystem.challenge.active) {
     eventSystem.updateChallengeProgress(1);
@@ -3743,12 +3751,15 @@ function gameLoop(timestamp) {
     updateSkills(dt);
     updateEntities(dt);
     updateSearchPoints(dt);
-    
+
     // 更新特殊事件
     if (eventSystem) {
       eventSystem.update();
       // 每分钟检查一次事件
-      if (Math.floor(gameState.time) % 60 === 0 && Math.floor(gameState.time) !== Math.floor(gameState.time - dt)) {
+      if (
+        Math.floor(gameState.time) % 60 === 0 &&
+        Math.floor(gameState.time) !== Math.floor(gameState.time - dt)
+      ) {
         eventSystem.checkEvent();
       }
     }
@@ -3831,7 +3842,7 @@ function startGame() {
 
   // 初始化对象池（性能优化）
   initAllPools();
-  
+
   // 初始化连击系统
   if (comboSystem) {
     comboSystem.startGame();
@@ -3934,11 +3945,11 @@ function gameOver() {
         <p>存活: ${formatTime(gameState.time)} | 等级: ${gameState.player.level}</p>
         <p>击杀: ${gameState.kills}</p>
         <p>获得天赋点: +${earnedPoints}</p>
-        ${comboSystem ? `<p style="color: #9b59b6; margin-top: 5px;">🔥 最高连击: ${comboSystem.combo.maxCombo}</p>` : ''}
+        ${comboSystem ? `<p style="color: #9b59b6; margin-top: 5px;">🔥 最高连击: ${comboSystem.combo.maxCombo}</p>` : ""}
         <p style="color: #f1c40f; margin-top: 10px;">可用天赋点: ${persistentData.talentPoints}</p>
         ${statisticsSystem ? `<p style="color: #3498db; margin-top: 5px; cursor: pointer;" onclick="statisticsSystem.showStatisticsPanel()">📊 查看详细统计</p>` : ""}
     `;
-    
+
   // 显示评级
   if (comboSystem) {
     setTimeout(() => {
