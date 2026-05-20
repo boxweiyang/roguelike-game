@@ -253,6 +253,107 @@ const ENEMY_TYPES = {
     size: 1.1,
     color: "#f39c12",
   },
+  // 新敌人类型
+  ghost: {
+    name: "幽灵",
+    icon: "👻",
+    hp: 30,
+    atk: 8,
+    speed: 1.6,
+    xp: 25,
+    gold: 15,
+    size: 0.8,
+    color: "#9b59b6",
+    ability: "phase", // 可以穿过敌人
+  },
+  spider: {
+    name: "毒蛛",
+    icon: "🕷️",
+    hp: 20,
+    atk: 6,
+    speed: 1.5,
+    xp: 20,
+    gold: 12,
+    size: 0.6,
+    color: "#2c3e50",
+    ability: "poison", // 攻击附带中毒
+  },
+  mage: {
+    name: "暗黑法师",
+    icon: "🧙",
+    hp: 35,
+    atk: 12,
+    speed: 0.9,
+    xp: 40,
+    gold: 25,
+    size: 0.8,
+    color: "#8e44ad",
+    ability: "ranged", // 远程攻击
+  },
+  assassin: {
+    name: "暗影刺客",
+    icon: "🗡️",
+    hp: 25,
+    atk: 18,
+    speed: 2.0,
+    xp: 35,
+    gold: 22,
+    size: 0.7,
+    color: "#34495e",
+    ability: "blink", // 可以瞬移
+  },
+  tank: {
+    name: "重装战士",
+    icon: "🛡️",
+    hp: 120,
+    atk: 10,
+    speed: 0.6,
+    xp: 50,
+    gold: 35,
+    size: 1.2,
+    color: "#7f8c8d",
+    ability: "armor", // 高护甲
+  },
+  // 精英敌人（带词缀）
+  elite_vampire: {
+    name: "吸血鬼精英",
+    icon: "🧛",
+    hp: 150,
+    atk: 20,
+    speed: 1.4,
+    xp: 100,
+    gold: 80,
+    size: 1.0,
+    color: "#c0392b",
+    isElite: true,
+    affixes: ["life_steal"], // 吸血
+  },
+  elite_explosive: {
+    name: "自爆精英",
+    icon: "💣",
+    hp: 50,
+    atk: 30,
+    speed: 1.8,
+    xp: 80,
+    gold: 60,
+    size: 0.9,
+    color: "#e67e22",
+    isElite: true,
+    affixes: ["explosive"], // 死亡爆炸
+  },
+  elite_shield: {
+    name: "护盾精英",
+    icon: "🔰",
+    hp: 200,
+    atk: 15,
+    speed: 1.0,
+    xp: 120,
+    gold: 100,
+    size: 1.1,
+    color: "#3498db",
+    isElite: true,
+    affixes: ["shield"], // 有护盾
+  },
 };
 
 // Boss类型
@@ -1433,6 +1534,11 @@ function updatePlayer(dt) {
   const stats = gameState.playerStats;
   if (!p || !stats) return;
 
+  // 更新状态效果
+  if (effectSystem) {
+    effectSystem.updateEffects(p);
+  }
+
   let dx = 0,
     dy = 0;
   if (gameState.keys["w"] || gameState.keys["arrowup"]) dy = -1;
@@ -1447,13 +1553,26 @@ function updatePlayer(dt) {
     return;
   }
 
-  if (dx !== 0 || dy !== 0) {
+  // 检查是否可以移动（眩晕/冰冻状态）
+  const canMove = effectSystem ? effectSystem.canMove(p) : true;
+
+  if (canMove && (dx !== 0 || dy !== 0)) {
     const len = Math.sqrt(dx * dx + dy * dy);
     dx /= len;
     dy /= len;
 
-    p.x = clamp(p.x + dx * stats.moveSpeed * dt, 1, CONFIG.ARENA_SIZE - 1);
-    p.y = clamp(p.y + dy * stats.moveSpeed * dt, 1, CONFIG.ARENA_SIZE - 1);
+    // 应用速度修正
+    const speedModifier = effectSystem ? effectSystem.getSpeedModifier(p) : 1.0;
+    p.x = clamp(
+      p.x + dx * stats.moveSpeed * speedModifier * dt,
+      1,
+      CONFIG.ARENA_SIZE - 1,
+    );
+    p.y = clamp(
+      p.y + dy * stats.moveSpeed * speedModifier * dt,
+      1,
+      CONFIG.ARENA_SIZE - 1,
+    );
   }
 
   autoPickup();
@@ -2090,6 +2209,16 @@ function killEnemy(enemy) {
   const stats = gameState.playerStats;
   p.kills++;
   gameState.kills++;
+
+  // 记录连击
+  if (comboSystem) {
+    comboSystem.recordKill(enemy.x, enemy.y);
+  }
+
+  // 更新挑战进度
+  if (eventSystem && eventSystem.challenge.active) {
+    eventSystem.updateChallengeProgress(1);
+  }
 
   // 记录击杀统计
   if (statisticsSystem) {
@@ -3623,6 +3752,18 @@ function gameLoop(timestamp) {
     updateEntities(dt);
     updateSearchPoints(dt);
 
+    // 更新特殊事件
+    if (eventSystem) {
+      eventSystem.update();
+      // 每分钟检查一次事件
+      if (
+        Math.floor(gameState.time) % 60 === 0 &&
+        Math.floor(gameState.time) !== Math.floor(gameState.time - dt)
+      ) {
+        eventSystem.checkEvent();
+      }
+    }
+
     if (timestamp - gameState.lastSpawnTime > CONFIG.ENEMY.SPAWN_INTERVAL) {
       spawnEnemies();
       gameState.lastSpawnTime = timestamp;
@@ -3701,6 +3842,11 @@ function startGame() {
 
   // 初始化对象池（性能优化）
   initAllPools();
+
+  // 初始化连击系统
+  if (comboSystem) {
+    comboSystem.startGame();
+  }
 
   gameState = {
     running: true,
@@ -3799,9 +3945,17 @@ function gameOver() {
         <p>存活: ${formatTime(gameState.time)} | 等级: ${gameState.player.level}</p>
         <p>击杀: ${gameState.kills}</p>
         <p>获得天赋点: +${earnedPoints}</p>
+        ${comboSystem ? `<p style="color: #9b59b6; margin-top: 5px;">🔥 最高连击: ${comboSystem.combo.maxCombo}</p>` : ""}
         <p style="color: #f1c40f; margin-top: 10px;">可用天赋点: ${persistentData.talentPoints}</p>
         ${statisticsSystem ? `<p style="color: #3498db; margin-top: 5px; cursor: pointer;" onclick="statisticsSystem.showStatisticsPanel()">📊 查看详细统计</p>` : ""}
     `;
+
+  // 显示评级
+  if (comboSystem) {
+    setTimeout(() => {
+      comboSystem.showRating(gameState.player.extracted);
+    }, 500);
+  }
 }
 
 // ============================================
