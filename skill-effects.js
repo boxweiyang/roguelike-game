@@ -409,27 +409,42 @@ class SkillEffectRenderer {
 
     // 渲染旋风
     renderWhirlwind(ctx, e) {
+        const elapsed = Date.now() - e.startTime;
+        const progress = elapsed / e.duration;
+        
+        // 刀刃应该在半径内旋转，而不是在半径边缘
+        const orbitRadius = e.radius * 0.6; // 使用60%的半径作为旋转轨道
         const bladeAngle = (Math.PI * 2) / e.bladeCount;
 
+        // 绘制外圈光环
+        ctx.strokeStyle = 'rgba(0, 255, 100, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = '#00ff66';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 绘制旋转的刀刃
         for (let i = 0; i < e.bladeCount; i++) {
             const angle = e.rotation + bladeAngle * i;
-            const x = e.x + Math.cos(angle) * e.radius;
-            const y = e.y + Math.sin(angle) * e.radius;
+            const x = e.x + Math.cos(angle) * orbitRadius;
+            const y = e.y + Math.sin(angle) * orbitRadius;
 
             // 刀刃
-            ctx.fillStyle = '#00ff00';
-            ctx.shadowColor = '#00ff00';
+            ctx.fillStyle = '#00ff66';
+            ctx.shadowColor = '#00ff66';
             ctx.shadowBlur = 10;
             
             ctx.beginPath();
-            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
             ctx.fill();
 
             // 轨迹
-            ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(0, 255, 102, 0.4)';
+            ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(e.x, e.y, e.radius, angle - 0.5, angle);
+            ctx.arc(e.x, e.y, orbitRadius, angle - 0.6, angle);
             ctx.stroke();
         }
 
