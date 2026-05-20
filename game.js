@@ -3294,10 +3294,10 @@ function render() {
   }
   ctx.globalAlpha = 1;
 
-  // 渲染新技能特效
-  if (skillManager) {
-    skillManager.render();
-  }
+  // 渲染新技能特效 - 已移至renderer.js中的render()函数
+  // if (skillManager) {
+  //   skillManager.render();
+  // }
 
   renderMinimap();
 }
@@ -3935,12 +3935,12 @@ function startGame() {
 
   // 初始化技能管理器（新系统）
   if (skillManager) {
-    const gameCanvas = document.getElementById('gameCanvas'); // 注意：id是gameCanvas不是game-canvas
+    const gameCanvas = document.getElementById("gameCanvas"); // 注意：id是gameCanvas不是game-canvas
     if (gameCanvas && ctx) {
       skillManager.init(gameCanvas, ctx);
-      console.log('技能管理器初始化成功');
+      console.log("技能管理器初始化成功");
     } else {
-      console.warn('技能管理器初始化失败: canvas=', gameCanvas, 'ctx=', ctx);
+      console.warn("技能管理器初始化失败: canvas=", gameCanvas, "ctx=", ctx);
     }
   }
 

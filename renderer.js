@@ -52,6 +52,11 @@ function render(gameState) {
     renderParticles(ctx, gameState.particles);
     renderFloatingTexts(ctx, gameState.floatingTexts);
     
+    // 渲染技能特效（在摄像机坐标系内）
+    if (skillManager && skillManager.skillEffects) {
+        skillManager.skillEffects.render(ctx);
+    }
+    
     ctx.restore();
     
     // 渲染小地图
