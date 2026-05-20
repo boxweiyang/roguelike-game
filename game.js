@@ -1115,8 +1115,8 @@ function equipSkin(skillId, skinId) {
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-const minimapCanvas = document.getElementById("minimapCanvas");
-const minimapCtx = minimapCanvas.getContext("2d");
+// 注意：gameCtx, minimapCanvas, minimapCtx 已在 renderer.js 中声明为全局变量
+// initRender() 会在 startGame() 时初始化它们
 
 // ============================================
 // 工具
@@ -3047,24 +3047,7 @@ function render() {
   renderMinimap();
 }
 
-function renderMinimap() {
-  minimapCtx.fillStyle = "#0d0d0d";
-  minimapCtx.fillRect(0, 0, 150, 150);
-
-  const ts = 150 / CONFIG.ARENA_SIZE;
-  const p = gameState.player;
-
-  minimapCtx.fillStyle = "#e74c3c";
-  for (const e of gameState.enemies)
-    minimapCtx.fillRect(e.x * ts - 1, e.y * ts - 1, 2, 2);
-
-  minimapCtx.fillStyle = "#f1c40f";
-  for (const c of gameState.chests)
-    minimapCtx.fillRect(c.x * ts - 1, c.y * ts - 1, 3, 3);
-
-  minimapCtx.fillStyle = "#3498db";
-  minimapCtx.fillRect(p.x * ts - 2, p.y * ts - 2, 4, 4);
-}
+// renderMinimap 已移至 renderer.js 中
 
 // ============================================
 // UI
