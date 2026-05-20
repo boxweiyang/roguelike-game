@@ -1433,6 +1433,11 @@ function updatePlayer(dt) {
   const stats = gameState.playerStats;
   if (!p || !stats) return;
 
+  // 更新状态效果
+  if (effectSystem) {
+    effectSystem.updateEffects(p);
+  }
+
   let dx = 0,
     dy = 0;
   if (gameState.keys["w"] || gameState.keys["arrowup"]) dy = -1;
@@ -1447,13 +1452,18 @@ function updatePlayer(dt) {
     return;
   }
 
-  if (dx !== 0 || dy !== 0) {
+  // 检查是否可以移动（眩晕/冰冻状态）
+  const canMove = effectSystem ? effectSystem.canMove(p) : true;
+  
+  if (canMove && (dx !== 0 || dy !== 0)) {
     const len = Math.sqrt(dx * dx + dy * dy);
     dx /= len;
     dy /= len;
 
-    p.x = clamp(p.x + dx * stats.moveSpeed * dt, 1, CONFIG.ARENA_SIZE - 1);
-    p.y = clamp(p.y + dy * stats.moveSpeed * dt, 1, CONFIG.ARENA_SIZE - 1);
+    // 应用速度修正
+    const speedModifier = effectSystem ? effectSystem.getSpeedModifier(p) : 1.0;
+    p.x = clamp(p.x + dx * stats.moveSpeed * speedModifier * dt, 1, CONFIG.ARENA_SIZE - 1);
+    p.y = clamp(p.y + dy * stats.moveSpeed * speedModifier * dt, 1, CONFIG.ARENA_SIZE - 1);
   }
 
   autoPickup();
@@ -2090,6 +2100,11 @@ function killEnemy(enemy) {
   const stats = gameState.playerStats;
   p.kills++;
   gameState.kills++;
+
+  // 记录连击
+  if (comboSystem) {
+    comboSystem.recordKill(enemy.x, enemy.y);
+  }
 
   // 记录击杀统计
   if (statisticsSystem) {
@@ -3701,6 +3716,11 @@ function startGame() {
 
   // 初始化对象池（性能优化）
   initAllPools();
+  
+  // 初始化连击系统
+  if (comboSystem) {
+    comboSystem.startGame();
+  }
 
   gameState = {
     running: true,
