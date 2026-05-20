@@ -1115,8 +1115,8 @@ function equipSkin(skillId, skinId) {
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-const minimapCanvas = document.getElementById("minimapCanvas");
-const minimapCtx = minimapCanvas.getContext("2d");
+// 注意：gameCtx, minimapCanvas, minimapCtx 已在 renderer.js 中声明为全局变量
+// initRender() 会在 startGame() 时初始化它们
 
 // ============================================
 // 工具
@@ -1480,6 +1480,12 @@ function autoPickup() {
       const val = Math.floor(item.value * (1 + stats.goldBonus));
       p.gold += val;
       persistentData.totalGold += val;
+
+      // 记录金币统计
+      if (statisticsSystem) {
+        statisticsSystem.recordGold(val);
+      }
+
       changed = true;
 
       // 更新任务进度 - 金币
@@ -1744,6 +1750,11 @@ function selectUpgrade(card) {
         existing.cooldown,
       );
 
+      // 记录技能升级统计
+      if (statisticsSystem) {
+        statisticsSystem.recordLevelUp(p.level, card.id);
+      }
+
       // 检查是否触发进化
       checkSkillEvolution(existing);
     } else {
@@ -1764,6 +1775,11 @@ function selectUpgrade(card) {
         "更新后技能列表:",
         p.skills.map((s) => ({ id: s.id, name: s.name, cooldown: s.cooldown })),
       );
+
+      // 记录技能获得统计
+      if (statisticsSystem) {
+        statisticsSystem.recordLevelUp(p.level, card.id);
+      }
 
       // 更新任务进度 - 技能获取
       updateQuestProgress("daily_use_3_skills", p.skills.length >= 3 ? 1 : 0);
@@ -2055,6 +2071,17 @@ function damageEnemy(enemy, damage, isCrit) {
     isCrit ? "#f1c40f" : "#e74c3c",
   );
   spawnParticles(enemy.x, enemy.y, enemy.color, 3);
+
+  // 记录伤害统计
+  if (statisticsSystem) {
+    statisticsSystem.recordDamage(
+      damage,
+      isCrit,
+      enemy.type,
+      enemy.lastHitSkill,
+    );
+  }
+
   if (enemy.hp <= 0) killEnemy(enemy);
 }
 
@@ -2063,6 +2090,11 @@ function killEnemy(enemy) {
   const stats = gameState.playerStats;
   p.kills++;
   gameState.kills++;
+
+  // 记录击杀统计
+  if (statisticsSystem) {
+    statisticsSystem.recordKill(enemy.type, enemy.lastHitSkill, enemy.isBoss);
+  }
 
   // 更新任务进度 - 击杀数
   updateQuestProgress("daily_kill_50", 1);
@@ -2444,12 +2476,22 @@ function openChest(chest) {
   const p = gameState.player;
   const stats = gameState.playerStats;
 
+  // 记录宝箱统计
+  if (statisticsSystem) {
+    statisticsSystem.recordChestOpened();
+  }
+
   switch (chest.type) {
     case "gold":
       const gold = Math.floor(chest.value * (1 + stats.goldBonus));
       p.gold += gold;
       persistentData.totalGold += gold;
       addFloatingText(chest.x, chest.y, `+${gold}💰`, "#f1c40f");
+
+      // 记录金币统计
+      if (statisticsSystem) {
+        statisticsSystem.recordGold(gold);
+      }
       break;
     case "xp":
       p.xp += chest.value * (1 + stats.xpBonus);
@@ -2464,6 +2506,11 @@ function openChest(chest) {
       p.gold += chest.value;
       persistentData.totalGold += chest.value;
       addFloatingText(chest.x, chest.y, `+${chest.value}💰`, "#f1c40f");
+
+      // 记录金币统计
+      if (statisticsSystem) {
+        statisticsSystem.recordGold(chest.value);
+      }
       break;
   }
 
@@ -3047,24 +3094,7 @@ function render() {
   renderMinimap();
 }
 
-function renderMinimap() {
-  minimapCtx.fillStyle = "#0d0d0d";
-  minimapCtx.fillRect(0, 0, 150, 150);
-
-  const ts = 150 / CONFIG.ARENA_SIZE;
-  const p = gameState.player;
-
-  minimapCtx.fillStyle = "#e74c3c";
-  for (const e of gameState.enemies)
-    minimapCtx.fillRect(e.x * ts - 1, e.y * ts - 1, 2, 2);
-
-  minimapCtx.fillStyle = "#f1c40f";
-  for (const c of gameState.chests)
-    minimapCtx.fillRect(c.x * ts - 1, c.y * ts - 1, 3, 3);
-
-  minimapCtx.fillStyle = "#3498db";
-  minimapCtx.fillRect(p.x * ts - 2, p.y * ts - 2, 4, 4);
-}
+// renderMinimap 已移至 renderer.js 中
 
 // ============================================
 // UI
@@ -3757,6 +3787,11 @@ function gameOver() {
   // 检查皮肤解锁
   checkSkinUnlocks();
 
+  // 记录游戏结束统计
+  if (statisticsSystem) {
+    statisticsSystem.onGameEnd(gameState.player.extracted);
+  }
+
   saveGame();
 
   document.getElementById("death-screen").classList.remove("hidden");
@@ -3765,6 +3800,7 @@ function gameOver() {
         <p>击杀: ${gameState.kills}</p>
         <p>获得天赋点: +${earnedPoints}</p>
         <p style="color: #f1c40f; margin-top: 10px;">可用天赋点: ${persistentData.talentPoints}</p>
+        ${statisticsSystem ? `<p style="color: #3498db; margin-top: 5px; cursor: pointer;" onclick="statisticsSystem.showStatisticsPanel()">📊 查看详细统计</p>` : ""}
     `;
 }
 
