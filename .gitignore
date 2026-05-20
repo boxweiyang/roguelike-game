@@ -1,0 +1,34 @@
+# 操作系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE和编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 浏览器
+*.log
+
+# Node.js (如果有)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 临时文件
+*.tmp
+*.temp
+nul
+
+# 环境配置
+.env
+.env.local
+.env.*.local
+
+# 构建输出
+dist/
+build/
