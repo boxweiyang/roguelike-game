@@ -1309,29 +1309,29 @@ function formatTime(s) {
 // ============================================
 
 function addFloatingText(x, y, text, color) {
-  gameState.floatingTexts.push({
-    x: x * CONFIG.TILE_SIZE,
-    y: y * CONFIG.TILE_SIZE - 10,
-    text,
-    color,
-    life: 40,
-    maxLife: 40,
-    vy: -2,
-  });
+  const ft = getFloatingTextFromPool();
+  ft.x = x * CONFIG.TILE_SIZE;
+  ft.y = y * CONFIG.TILE_SIZE - 10;
+  ft.text = text;
+  ft.color = color;
+  ft.life = 40;
+  ft.maxLife = 40;
+  ft.vy = -2;
+  gameState.floatingTexts.push(ft);
 }
 
 function spawnParticles(x, y, color, count = 10) {
   for (let i = 0; i < count; i++) {
-    gameState.particles.push({
-      x: x * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
-      y: y * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2,
-      vx: (Math.random() - 0.5) * 6,
-      vy: (Math.random() - 0.5) * 6,
-      life: rand(15, 30),
-      maxLife: 30,
-      color,
-      size: rand(2, 5),
-    });
+    const particle = getParticleFromPool();
+    particle.x = x * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2;
+    particle.y = y * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2;
+    particle.vx = (Math.random() - 0.5) * 6;
+    particle.vy = (Math.random() - 0.5) * 6;
+    particle.life = rand(15, 30);
+    particle.maxLife = 30;
+    particle.color = color;
+    particle.size = rand(2, 5);
+    gameState.particles.push(particle);
   }
 }
 
@@ -1342,20 +1342,36 @@ function updateEffects() {
     p.life--;
     p.size *= 0.95;
     p.vy += 0.15;
+    if (p.life <= 0) {
+      releaseParticleToPool(p);
+      return false;
+    }
     return p.life > 0;
   });
   gameState.floatingTexts = gameState.floatingTexts.filter((ft) => {
     ft.y += ft.vy;
     ft.life--;
+    if (ft.life <= 0) {
+      releaseFloatingTextToPool(ft);
+      return false;
+    }
     return ft.life > 0;
   });
   gameState.lightnings = gameState.lightnings.filter((l) => {
     l.life--;
+    if (l.life <= 0) {
+      releaseLightningToPool(l);
+      return false;
+    }
     return l.life > 0;
   });
   gameState.whirlwinds = gameState.whirlwinds.filter((w) => {
     w.life--;
     w.angle += 0.2;
+    if (w.life <= 0) {
+      releaseWhirlwindToPool(w);
+      return false;
+    }
     return w.life > 0;
   });
 }
