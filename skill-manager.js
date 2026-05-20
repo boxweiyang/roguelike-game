@@ -606,15 +606,18 @@ class SkillManager {
         });
         
         // 渲染环绕物
-        this.orbitals.forEach(orb => {
-            const orbX = player.x + Math.cos(orb.angle) * orb.radius;
-            const orbY = player.y + Math.sin(orb.angle) * orb.radius;
-            
-            ctx.fillStyle = '#00ff00';
-            ctx.beginPath();
-            ctx.arc(orbX, orbY, 8, 0, Math.PI * 2);
-            ctx.fill();
-        });
+        if (gameState.player) {
+            const player = gameState.player;
+            this.orbitals.forEach(orb => {
+                const orbX = player.x + Math.cos(orb.angle) * orb.radius;
+                const orbY = player.y + Math.sin(orb.angle) * orb.radius;
+                
+                ctx.fillStyle = '#00ff00';
+                ctx.beginPath();
+                ctx.arc(orbX, orbY, 8, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
     }
 
     // 获取玩家技能列表（用于UI显示）
