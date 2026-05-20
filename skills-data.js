@@ -4,1732 +4,1740 @@
 // ============================================
 
 const SKILLS_DATA = {
-    // ==================== T0 神技 ====================
-    
-    // 1. 死亡旋风
-    death_whirlwind: {
-        id: 'death_whirlwind',
-        name: '死亡旋风',
-        icon: '🌪️',
-        type: 'melee_aoe',
-        rarity: 'legendary',
-        description: '释放旋转刀刃攻击周围所有敌人',
-        
-        // 基础属性
-        baseDamage: 25,
-        baseRange: 3,
-        baseCooldown: 1200,
-        bladeCount: 4,
-        
-        // 伤害公式说明
-        damageFormula: '最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 技能伤害%)',
-        
-        // 每级详细配置
-        levels: [
-            {
-                level: 1,
-                damage: 25,
-                range: 3,
-                blades: 4,
-                cooldown: 1200,
-                description: '释放4个旋转刀刃，每个造成25点伤害，范围3格',
-                visual: '小型蓝色刀刃，旋转轨迹',
-                effect: 'blade_spin'
-            },
-            {
-                level: 2,
-                damage: 30,
-                range: 3,
-                blades: 4,
-                cooldown: 1100,
-                description: '刀刃伤害提升至30，冷却缩短至1.1秒',
-                visual: '刀刃体积增大20%，蓝色光效增强',
-                effect: 'blade_spin_enhanced'
-            },
-            {
-                level: 3,
-                damage: 38,
-                range: 4,
-                blades: 6,
-                cooldown: 1000,
-                description: '刀刃数量+2，范围+1格，每秒伤害提升50%',
-                visual: '6个刀刃同时旋转，范围明显扩大',
-                effect: 'blade_spin_wide'
-            },
-            {
-                level: 4,
-                damage: 45,
-                range: 4,
-                blades: 6,
-                cooldown: 900,
-                description: '刀刃可以穿透1个敌人，伤害提升',
-                visual: '刀刃带穿透光效，击中后继续飞行',
-                effect: 'blade_piercing'
-            },
-            {
-                level: 5,
-                damage: 55,
-                range: 5,
-                blades: 8,
-                cooldown: 800,
-                description: '刀刃+2，范围+1，移动时留下火焰轨迹(每秒10点伤害)',
-                visual: '8个大型刀刃，地面留下燃烧轨迹',
-                effect: 'blade_fire_trail'
-            },
-            {
-                level: 6,
-                damage: 65,
-                range: 5,
-                blades: 8,
-                cooldown: 700,
-                description: '火焰轨迹伤害提升至15/秒，范围扩大',
-                visual: '火焰轨迹更宽更亮，伤害数字跳动',
-                effect: 'blade_fire_trail_intense'
-            },
-            {
-                level: 7,
-                damage: 78,
-                range: 6,
-                blades: 10,
-                cooldown: 600,
-                description: '刀刃+2，范围+1，刀刃附带5%吸血效果',
-                visual: '10个刀刃带红色吸血光效',
-                effect: 'blade_lifesteal'
-            },
-            {
-                level: 8,
-                damage: 93,
-                range: 7,
-                blades: 12,
-                cooldown: 500,
-                description: '满级！12个刀刃，范围7格，吸血提升至10%',
-                visual: '12个刀刃高速旋转，强烈红色光效',
-                effect: 'blade_lifesteal_max',
-                evolution: {
-                    requiredPassive: 'attack_speed',
-                    evolvedSkill: 'apocalypse_tornado',
-                    evolvedName: '末日龙卷风'
-                }
-            }
-        ],
-        
-        // 超武进化
+  // ==================== T0 神技 ====================
+
+  // 1. 死亡旋风
+  death_whirlwind: {
+    id: "death_whirlwind",
+    name: "死亡旋风",
+    icon: "🌪️",
+    type: "melee_aoe",
+    rarity: "legendary",
+    description: "释放旋转刀刃攻击周围所有敌人",
+
+    // 基础属性
+    baseDamage: 25,
+    baseRange: 3,
+    baseCooldown: 1200,
+    bladeCount: 4,
+
+    // 伤害公式说明
+    damageFormula:
+      "最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 技能伤害%)",
+
+    // 每级详细配置
+    levels: [
+      {
+        level: 1,
+        damage: 25,
+        range: 3,
+        blades: 4,
+        cooldown: 1200,
+        description: "释放4个旋转刀刃，每个造成25点伤害，范围3格",
+        visual: "小型蓝色刀刃，旋转轨迹",
+        effect: "blade_spin",
+      },
+      {
+        level: 2,
+        damage: 30,
+        range: 3,
+        blades: 4,
+        cooldown: 1100,
+        description: "刀刃伤害提升至30，冷却缩短至1.1秒",
+        visual: "刀刃体积增大20%，蓝色光效增强",
+        effect: "blade_spin_enhanced",
+      },
+      {
+        level: 3,
+        damage: 38,
+        range: 4,
+        blades: 6,
+        cooldown: 1000,
+        description: "刀刃数量+2，范围+1格，每秒伤害提升50%",
+        visual: "6个刀刃同时旋转，范围明显扩大",
+        effect: "blade_spin_wide",
+      },
+      {
+        level: 4,
+        damage: 45,
+        range: 4,
+        blades: 6,
+        cooldown: 900,
+        description: "刀刃可以穿透1个敌人，伤害提升",
+        visual: "刀刃带穿透光效，击中后继续飞行",
+        effect: "blade_piercing",
+      },
+      {
+        level: 5,
+        damage: 55,
+        range: 5,
+        blades: 8,
+        cooldown: 800,
+        description: "刀刃+2，范围+1，移动时留下火焰轨迹(每秒10点伤害)",
+        visual: "8个大型刀刃，地面留下燃烧轨迹",
+        effect: "blade_fire_trail",
+      },
+      {
+        level: 6,
+        damage: 65,
+        range: 5,
+        blades: 8,
+        cooldown: 700,
+        description: "火焰轨迹伤害提升至15/秒，范围扩大",
+        visual: "火焰轨迹更宽更亮，伤害数字跳动",
+        effect: "blade_fire_trail_intense",
+      },
+      {
+        level: 7,
+        damage: 78,
+        range: 6,
+        blades: 10,
+        cooldown: 600,
+        description: "刀刃+2，范围+1，刀刃附带5%吸血效果",
+        visual: "10个刀刃带红色吸血光效",
+        effect: "blade_lifesteal",
+      },
+      {
+        level: 8,
+        damage: 93,
+        range: 7,
+        blades: 12,
+        cooldown: 500,
+        description: "满级！12个刀刃，范围7格，吸血提升至10%",
+        visual: "12个刀刃高速旋转，强烈红色光效",
+        effect: "blade_lifesteal_max",
         evolution: {
-            id: 'apocalypse_tornado',
-            name: '末日龙卷风',
-            icon: '🌪️🌪️',
-            rarity: 'mythic',
-            damage: 150,
-            range: 15,
-            hitsPerSecond: 10,
-            description: '龙卷风可移动并自动追踪敌人，每秒造成10次伤害',
-            visual: '巨型黑色龙卷风，全屏可见，闪电特效',
-            effects: ['tracking', 'knockback', 'lifesteal_15%']
-        }
+          requiredPassive: "attack_speed",
+          evolvedSkill: "apocalypse_tornado",
+          evolvedName: "末日龙卷风",
+        },
+      },
+    ],
+
+    // 超武进化
+    evolution: {
+      id: "apocalypse_tornado",
+      name: "末日龙卷风",
+      icon: "🌪️🌪️",
+      rarity: "mythic",
+      damage: 150,
+      range: 15,
+      hitsPerSecond: 10,
+      description: "龙卷风可移动并自动追踪敌人，每秒造成10次伤害",
+      visual: "巨型黑色龙卷风，全屏可见，闪电特效",
+      effects: ["tracking", "knockback", "lifesteal_15%"],
     },
-    
-    // 2. 雷暴领域
-    thunderstorm: {
-        id: 'thunderstorm',
-        name: '雷暴领域',
-        icon: '⚡',
-        type: 'auto_aoe',
-        rarity: 'legendary',
-        description: '召唤闪电劈向敌人，可以连锁攻击',
-        
-        baseDamage: 30,
-        baseRange: 5,
-        baseCooldown: 800,
-        lightningCount: 1,
-        chainCount: 0,
-        
-        damageFormula: '最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 闪电伤害%)',
-        
-        levels: [
-            {
-                level: 1,
-                damage: 30,
-                range: 5,
-                lightnings: 1,
-                chain: 0,
-                cooldown: 800,
-                description: '召唤1道闪电劈向最近敌人，造成30点伤害',
-                visual: '蓝色闪电，从天而降',
-                effect: 'lightning_single'
-            },
-            {
-                level: 2,
-                damage: 36,
-                range: 5,
-                lightnings: 1,
-                chain: 2,
-                cooldown: 750,
-                description: '闪电可以连锁2个额外敌人',
-                visual: '闪电击中后弹跳到附近敌人',
-                effect: 'lightning_chain_2'
-            },
-            {
-                level: 3,
-                damage: 45,
-                range: 6,
-                lightnings: 2,
-                chain: 2,
-                cooldown: 700,
-                description: '闪电数量+1，范围+1格，伤害提升',
-                visual: '2道闪电同时劈下',
-                effect: 'lightning_double'
-            },
-            {
-                level: 4,
-                damage: 54,
-                range: 6,
-                lightnings: 2,
-                chain: 5,
-                cooldown: 650,
-                description: '连锁+3，范围扩大，伤害提升',
-                visual: '连锁范围明显扩大，闪电更粗',
-                effect: 'lightning_chain_5'
-            },
-            {
-                level: 5,
-                damage: 66,
-                range: 8,
-                lightnings: 3,
-                chain: 5,
-                cooldown: 600,
-                description: '闪电+1，范围+2格，每次3道闪电',
-                visual: '3道闪电密集劈下，范围覆盖大',
-                effect: 'lightning_triple'
-            },
-            {
-                level: 6,
-                damage: 78,
-                range: 8,
-                lightnings: 3,
-                chain: 8,
-                cooldown: 550,
-                description: '连锁+3，闪电麻痹敌人0.5秒',
-                visual: '闪电带紫色麻痹光效，敌人眩晕',
-                effect: 'lightning_paralyze'
-            },
-            {
-                level: 7,
-                damage: 93,
-                range: 10,
-                lightnings: 5,
-                chain: 8,
-                cooldown: 500,
-                description: '闪电+2，范围+2格，5道闪电同时攻击',
-                visual: '5道闪电同时劈下，雷声轰鸣',
-                effect: 'lightning_penta'
-            },
-            {
-                level: 8,
-                damage: 111,
-                range: 15,
-                lightnings: 8,
-                chain: 10,
-                cooldown: 400,
-                description: '满级！头顶形成雷暴云持续放电',
-                visual: '玩家头顶巨大雷暴云，闪电不断落下',
-                effect: 'thundercloud',
-                evolution: {
-                    requiredPassive: 'lightning_damage',
-                    evolvedSkill: 'divine_thunderstorm',
-                    evolvedName: '天罚雷暴'
-                }
-            }
-        ],
-        
+  },
+
+  // 2. 雷暴领域
+  thunderstorm: {
+    id: "thunderstorm",
+    name: "雷暴领域",
+    icon: "⚡",
+    type: "auto_aoe",
+    rarity: "legendary",
+    description: "召唤闪电劈向敌人，可以连锁攻击",
+
+    baseDamage: 30,
+    baseRange: 5,
+    baseCooldown: 800,
+    lightningCount: 1,
+    chainCount: 0,
+
+    damageFormula:
+      "最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 闪电伤害%)",
+
+    levels: [
+      {
+        level: 1,
+        damage: 30,
+        range: 5,
+        lightnings: 1,
+        chain: 0,
+        cooldown: 800,
+        description: "召唤1道闪电劈向最近敌人，造成30点伤害",
+        visual: "蓝色闪电，从天而降",
+        effect: "lightning_single",
+      },
+      {
+        level: 2,
+        damage: 36,
+        range: 5,
+        lightnings: 1,
+        chain: 2,
+        cooldown: 750,
+        description: "闪电可以连锁2个额外敌人",
+        visual: "闪电击中后弹跳到附近敌人",
+        effect: "lightning_chain_2",
+      },
+      {
+        level: 3,
+        damage: 45,
+        range: 6,
+        lightnings: 2,
+        chain: 2,
+        cooldown: 700,
+        description: "闪电数量+1，范围+1格，伤害提升",
+        visual: "2道闪电同时劈下",
+        effect: "lightning_double",
+      },
+      {
+        level: 4,
+        damage: 54,
+        range: 6,
+        lightnings: 2,
+        chain: 5,
+        cooldown: 650,
+        description: "连锁+3，范围扩大，伤害提升",
+        visual: "连锁范围明显扩大，闪电更粗",
+        effect: "lightning_chain_5",
+      },
+      {
+        level: 5,
+        damage: 66,
+        range: 8,
+        lightnings: 3,
+        chain: 5,
+        cooldown: 600,
+        description: "闪电+1，范围+2格，每次3道闪电",
+        visual: "3道闪电密集劈下，范围覆盖大",
+        effect: "lightning_triple",
+      },
+      {
+        level: 6,
+        damage: 78,
+        range: 8,
+        lightnings: 3,
+        chain: 8,
+        cooldown: 550,
+        description: "连锁+3，闪电麻痹敌人0.5秒",
+        visual: "闪电带紫色麻痹光效，敌人眩晕",
+        effect: "lightning_paralyze",
+      },
+      {
+        level: 7,
+        damage: 93,
+        range: 10,
+        lightnings: 5,
+        chain: 8,
+        cooldown: 500,
+        description: "闪电+2，范围+2格，5道闪电同时攻击",
+        visual: "5道闪电同时劈下，雷声轰鸣",
+        effect: "lightning_penta",
+      },
+      {
+        level: 8,
+        damage: 111,
+        range: 15,
+        lightnings: 8,
+        chain: 10,
+        cooldown: 400,
+        description: "满级！头顶形成雷暴云持续放电",
+        visual: "玩家头顶巨大雷暴云，闪电不断落下",
+        effect: "thundercloud",
         evolution: {
-            id: 'divine_thunderstorm',
-            name: '天罚雷暴',
-            icon: '⚡⚡',
-            rarity: 'mythic',
-            damage: 200,
-            range: 'fullscreen',
-            lightningsPerSecond: 20,
-            description: '全屏雷暴，每秒20道闪电，麻痹敌人2秒',
-            visual: '全屏闪电风暴，玩家头顶巨型雷暴云跟随',
-            effects: ['fullscreen', 'paralyze_2s', 'thundercloud_follows']
-        }
+          requiredPassive: "lightning_damage",
+          evolvedSkill: "divine_thunderstorm",
+          evolvedName: "天罚雷暴",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "divine_thunderstorm",
+      name: "天罚雷暴",
+      icon: "⚡⚡",
+      rarity: "mythic",
+      damage: 200,
+      range: "fullscreen",
+      lightningsPerSecond: 20,
+      description: "全屏雷暴，每秒20道闪电，麻痹敌人2秒",
+      visual: "全屏闪电风暴，玩家头顶巨型雷暴云跟随",
+      effects: ["fullscreen", "paralyze_2s", "thundercloud_follows"],
     },
-    
-    // 3. 地狱火雨
-    hellfire_rain: {
-        id: 'hellfire_rain',
-        name: '地狱火雨',
-        icon: '🔥',
-        type: 'aoe_projectile',
-        rarity: 'legendary',
-        description: '从天上掉落火球轰炸敌人，造成范围伤害',
-        
-        baseDamage: 40,
-        baseRange: 3,
-        baseCooldown: 2000,
-        projectileCount: 3,
-        
-        damageFormula: '最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 火焰伤害%)',
-        
-        levels: [
-            {
-                level: 1,
-                damage: 40,
-                range: 3,
-                projectiles: 3,
-                cooldown: 2000,
-                description: '每次掉落3个火球，爆炸范围3格',
-                visual: '小型火球从天而降，橙色爆炸',
-                effect: 'fireball_small'
-            },
-            {
-                level: 2,
-                damage: 48,
-                range: 3,
-                projectiles: 4,
-                cooldown: 1900,
-                description: '火球+1，爆炸伤害提升',
-                visual: '火球稍大，爆炸范围扩大',
-                effect: 'fireball_medium'
-            },
-            {
-                level: 3,
-                damage: 60,
-                range: 4,
-                projectiles: 5,
-                cooldown: 1800,
-                description: '火球+1，范围+1格，爆炸更剧烈',
-                visual: '5个火球，爆炸产生冲击波',
-                effect: 'fireball_explosion'
-            },
-            {
-                level: 4,
-                damage: 72,
-                range: 4,
-                projectiles: 6,
-                cooldown: 1700,
-                description: '火球+1，爆炸后留下火焰地面(2秒，每秒8伤害)',
-                visual: '地面燃烧，持续伤害数字',
-                effect: 'fire_ground'
-            },
-            {
-                level: 5,
-                damage: 88,
-                range: 5,
-                projectiles: 8,
-                cooldown: 1600,
-                description: '火球+2，范围+1，火焰地面伤害提升至12/秒',
-                visual: '8个火球覆盖大范围，地面火焰更旺',
-                effect: 'fire_ground_intense'
-            },
-            {
-                level: 6,
-                damage: 104,
-                range: 5,
-                projectiles: 10,
-                cooldown: 1500,
-                description: '火球+2，火焰地面持续3秒',
-                visual: '火焰地面持续更久，红色区域明显',
-                effect: 'fire_ground_long'
-            },
-            {
-                level: 7,
-                damage: 124,
-                range: 6,
-                projectiles: 12,
-                cooldown: 1400,
-                description: '火球+2，范围+1，爆炸击退敌人',
-                visual: '火球爆炸产生冲击波击飞敌人',
-                effect: 'fireball_knockback'
-            },
-            {
-                level: 8,
-                damage: 148,
-                range: 7,
-                projectiles: 15,
-                cooldown: 1200,
-                description: '满级！15个火球覆盖大范围',
-                visual: '密集火球雨，地面全在燃烧',
-                effect: 'meteor_rain',
-                evolution: {
-                    requiredPassive: 'duration',
-                    evolvedSkill: 'meteor_disaster',
-                    evolvedName: '陨石天灾'
-                }
-            }
-        ],
-        
+  },
+
+  // 3. 地狱火雨
+  hellfire_rain: {
+    id: "hellfire_rain",
+    name: "地狱火雨",
+    icon: "🔥",
+    type: "aoe_projectile",
+    rarity: "legendary",
+    description: "从天上掉落火球轰炸敌人，造成范围伤害",
+
+    baseDamage: 40,
+    baseRange: 3,
+    baseCooldown: 2000,
+    projectileCount: 3,
+
+    damageFormula:
+      "最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 火焰伤害%)",
+
+    levels: [
+      {
+        level: 1,
+        damage: 40,
+        range: 3,
+        projectiles: 3,
+        cooldown: 2000,
+        description: "每次掉落3个火球，爆炸范围3格",
+        visual: "小型火球从天而降，橙色爆炸",
+        effect: "fireball_small",
+      },
+      {
+        level: 2,
+        damage: 48,
+        range: 3,
+        projectiles: 4,
+        cooldown: 1900,
+        description: "火球+1，爆炸伤害提升",
+        visual: "火球稍大，爆炸范围扩大",
+        effect: "fireball_medium",
+      },
+      {
+        level: 3,
+        damage: 60,
+        range: 4,
+        projectiles: 5,
+        cooldown: 1800,
+        description: "火球+1，范围+1格，爆炸更剧烈",
+        visual: "5个火球，爆炸产生冲击波",
+        effect: "fireball_explosion",
+      },
+      {
+        level: 4,
+        damage: 72,
+        range: 4,
+        projectiles: 6,
+        cooldown: 1700,
+        description: "火球+1，爆炸后留下火焰地面(2秒，每秒8伤害)",
+        visual: "地面燃烧，持续伤害数字",
+        effect: "fire_ground",
+      },
+      {
+        level: 5,
+        damage: 88,
+        range: 5,
+        projectiles: 8,
+        cooldown: 1600,
+        description: "火球+2，范围+1，火焰地面伤害提升至12/秒",
+        visual: "8个火球覆盖大范围，地面火焰更旺",
+        effect: "fire_ground_intense",
+      },
+      {
+        level: 6,
+        damage: 104,
+        range: 5,
+        projectiles: 10,
+        cooldown: 1500,
+        description: "火球+2，火焰地面持续3秒",
+        visual: "火焰地面持续更久，红色区域明显",
+        effect: "fire_ground_long",
+      },
+      {
+        level: 7,
+        damage: 124,
+        range: 6,
+        projectiles: 12,
+        cooldown: 1400,
+        description: "火球+2，范围+1，爆炸击退敌人",
+        visual: "火球爆炸产生冲击波击飞敌人",
+        effect: "fireball_knockback",
+      },
+      {
+        level: 8,
+        damage: 148,
+        range: 7,
+        projectiles: 15,
+        cooldown: 1200,
+        description: "满级！15个火球覆盖大范围",
+        visual: "密集火球雨，地面全在燃烧",
+        effect: "meteor_rain",
         evolution: {
-            id: 'meteor_disaster',
-            name: '陨石天灾',
-            icon: '🔥🔥',
-            rarity: 'mythic',
-            damage: 300,
-            range: 10,
-            projectiles: 30,
-            description: '掉落陨石而不是火球，每个范围10格，击飞敌人',
-            visual: '巨型陨石从天而降，全屏爆炸，熔岩区域',
-            effects: ['meteor', 'knockback', 'lava_ground']
-        }
+          requiredPassive: "duration",
+          evolvedSkill: "meteor_disaster",
+          evolvedName: "陨石天灾",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "meteor_disaster",
+      name: "陨石天灾",
+      icon: "🔥🔥",
+      rarity: "mythic",
+      damage: 300,
+      range: 10,
+      projectiles: 30,
+      description: "掉落陨石而不是火球，每个范围10格，击飞敌人",
+      visual: "巨型陨石从天而降，全屏爆炸，熔岩区域",
+      effects: ["meteor", "knockback", "lava_ground"],
     },
-    
-    // ==================== T1 强力技能 ====================
-    
-    // 4. 剑刃风暴
-    blade_storm: {
-        id: 'blade_storm',
-        name: '剑刃风暴',
-        icon: '🗡️',
-        type: 'orbit',
-        rarity: 'epic',
-        description: '剑刃围绕玩家旋转，自动攻击接触的敌人',
-        
-        baseDamage: 20,
-        baseRange: 2,
-        baseCooldown: 0,
-        bladeCount: 4,
+  },
+
+  // ==================== T1 强力技能 ====================
+
+  // 4. 剑刃风暴
+  blade_storm: {
+    id: "blade_storm",
+    name: "剑刃风暴",
+    icon: "🗡️",
+    type: "orbit",
+    rarity: "epic",
+    description: "剑刃围绕玩家旋转，自动攻击接触的敌人",
+
+    baseDamage: 20,
+    baseRange: 2,
+    baseCooldown: 0,
+    bladeCount: 4,
+    rotationSpeed: 1,
+
+    damageFormula:
+      "最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × 击中次数",
+
+    levels: [
+      {
+        level: 1,
+        damage: 20,
+        range: 2,
+        blades: 4,
         rotationSpeed: 1,
-        
-        damageFormula: '最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × 击中次数',
-        
-        levels: [
-            {
-                level: 1,
-                damage: 20,
-                range: 2,
-                blades: 4,
-                rotationSpeed: 1,
-                description: '4把剑围绕玩家旋转，每把造成20点伤害',
-                visual: '4把剑缓慢旋转，蓝色光效',
-                effect: 'swords_orbit'
-            },
-            {
-                level: 2,
-                damage: 24,
-                range: 2.5,
-                blades: 4,
-                rotationSpeed: 1.2,
-                description: '范围+0.5格，旋转速度+20%',
-                visual: '剑旋转更快',
-                effect: 'swords_fast'
-            },
-            {
-                level: 3,
-                damage: 30,
-                range: 3,
-                blades: 8,
-                rotationSpeed: 1.2,
-                description: '剑刃+4，范围+1，可以穿透敌人',
-                visual: '8把剑，穿透效果',
-                effect: 'swords_piercing'
-            },
-            {
-                level: 4,
-                damage: 36,
-                range: 3.5,
-                blades: 8,
-                rotationSpeed: 1.4,
-                description: '剑刃变大，范围+0.5格，旋转速度提升',
-                visual: '剑刃明显变大',
-                effect: 'swords_large'
-            },
-            {
-                level: 5,
-                damage: 44,
-                range: 4,
-                blades: 12,
-                rotationSpeed: 1.4,
-                description: '剑刃+4，范围+1，剑刃带毒(每秒5伤害，持续2秒)',
-                visual: '12把剑带绿色毒光',
-                effect: 'swords_poison'
-            },
-            {
-                level: 6,
-                damage: 52,
-                range: 4.5,
-                blades: 12,
-                rotationSpeed: 1.6,
-                description: '毒伤害提升至8/秒，持续3秒',
-                visual: '毒光更明显，伤害数字跳动',
-                effect: 'swords_poison_strong'
-            },
-            {
-                level: 7,
-                damage: 62,
-                range: 5,
-                blades: 16,
-                rotationSpeed: 1.6,
-                description: '剑刃+4，范围+1，形成剑刃风暴',
-                visual: '16把剑形成密集风暴',
-                effect: 'blade_storm'
-            },
-            {
-                level: 8,
-                damage: 74,
-                range: 6,
-                blades: 20,
-                rotationSpeed: 1.8,
-                description: '满级！20把剑，范围6格，高速旋转',
-                visual: '20把剑高速旋转，剑刃风暴成型',
-                effect: 'blade_storm_max',
-                evolution: {
-                    requiredPassive: 'projectile_count',
-                    evolvedSkill: 'ten_thousand_swords',
-                    evolvedName: '万剑归宗'
-                }
-            }
-        ],
-        
+        description: "4把剑围绕玩家旋转，每把造成20点伤害",
+        visual: "4把剑缓慢旋转，蓝色光效",
+        effect: "swords_orbit",
+      },
+      {
+        level: 2,
+        damage: 24,
+        range: 2.5,
+        blades: 4,
+        rotationSpeed: 1.2,
+        description: "范围+0.5格，旋转速度+20%",
+        visual: "剑旋转更快",
+        effect: "swords_fast",
+      },
+      {
+        level: 3,
+        damage: 30,
+        range: 3,
+        blades: 8,
+        rotationSpeed: 1.2,
+        description: "剑刃+4，范围+1，可以穿透敌人",
+        visual: "8把剑，穿透效果",
+        effect: "swords_piercing",
+      },
+      {
+        level: 4,
+        damage: 36,
+        range: 3.5,
+        blades: 8,
+        rotationSpeed: 1.4,
+        description: "剑刃变大，范围+0.5格，旋转速度提升",
+        visual: "剑刃明显变大",
+        effect: "swords_large",
+      },
+      {
+        level: 5,
+        damage: 44,
+        range: 4,
+        blades: 12,
+        rotationSpeed: 1.4,
+        description: "剑刃+4，范围+1，剑刃带毒(每秒5伤害，持续2秒)",
+        visual: "12把剑带绿色毒光",
+        effect: "swords_poison",
+      },
+      {
+        level: 6,
+        damage: 52,
+        range: 4.5,
+        blades: 12,
+        rotationSpeed: 1.6,
+        description: "毒伤害提升至8/秒，持续3秒",
+        visual: "毒光更明显，伤害数字跳动",
+        effect: "swords_poison_strong",
+      },
+      {
+        level: 7,
+        damage: 62,
+        range: 5,
+        blades: 16,
+        rotationSpeed: 1.6,
+        description: "剑刃+4，范围+1，形成剑刃风暴",
+        visual: "16把剑形成密集风暴",
+        effect: "blade_storm",
+      },
+      {
+        level: 8,
+        damage: 74,
+        range: 6,
+        blades: 20,
+        rotationSpeed: 1.8,
+        description: "满级！20把剑，范围6格，高速旋转",
+        visual: "20把剑高速旋转，剑刃风暴成型",
+        effect: "blade_storm_max",
         evolution: {
-            id: 'ten_thousand_swords',
-            name: '万剑归宗',
-            icon: '🗡️🗡️',
-            rarity: 'mythic',
-            damage: 100,
-            bladeCount: 100,
-            description: '100把剑形成剑阵，可手动释放集火',
-            visual: '百把剑形成巨大剑阵，金光闪闪',
-            effects: ['sword_array', 'manual_target', 'lifesteal']
-        }
+          requiredPassive: "projectile_count",
+          evolvedSkill: "ten_thousand_swords",
+          evolvedName: "万剑归宗",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "ten_thousand_swords",
+      name: "万剑归宗",
+      icon: "🗡️🗡️",
+      rarity: "mythic",
+      damage: 100,
+      bladeCount: 100,
+      description: "100把剑形成剑阵，可手动释放集火",
+      visual: "百把剑形成巨大剑阵，金光闪闪",
+      effects: ["sword_array", "manual_target", "lifesteal"],
     },
-    
-    // 5. 爆裂飞弹
-    explosive_missiles: {
-        id: 'explosive_missiles',
-        name: '爆裂飞弹',
-        icon: '💥',
-        type: 'homing_projectile',
-        rarity: 'epic',
-        description: '发射追踪飞弹，命中后爆炸',
-        
-        baseDamage: 35,
-        baseRange: 10,
-        baseCooldown: 1000,
-        missileCount: 1,
+  },
+
+  // 5. 爆裂飞弹
+  explosive_missiles: {
+    id: "explosive_missiles",
+    name: "爆裂飞弹",
+    icon: "💥",
+    type: "homing_projectile",
+    rarity: "epic",
+    description: "发射追踪飞弹，命中后爆炸",
+
+    baseDamage: 35,
+    baseRange: 10,
+    baseCooldown: 1000,
+    missileCount: 1,
+    explosionRadius: 2,
+
+    damageFormula:
+      "最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × 爆炸范围加成",
+
+    levels: [
+      {
+        level: 1,
+        damage: 35,
+        missiles: 1,
+        range: 10,
         explosionRadius: 2,
-        
-        damageFormula: '最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × 爆炸范围加成',
-        
-        levels: [
-            {
-                level: 1,
-                damage: 35,
-                missiles: 1,
-                range: 10,
-                explosionRadius: 2,
-                cooldown: 1000,
-                description: '发射1个追踪飞弹，爆炸范围2格',
-                visual: '小型飞弹，橙色尾焰',
-                effect: 'missile_single'
-            },
-            {
-                level: 2,
-                damage: 42,
-                missiles: 2,
-                range: 10,
-                explosionRadius: 2,
-                cooldown: 950,
-                description: '飞弹+1，追踪速度+50%',
-                visual: '2个飞弹同时发射',
-                effect: 'missile_double'
-            },
-            {
-                level: 3,
-                damage: 53,
-                missiles: 3,
-                range: 12,
-                explosionRadius: 3,
-                cooldown: 900,
-                description: '飞弹+1，范围+2格，爆炸范围+1',
-                visual: '3个飞弹，爆炸更大',
-                effect: 'missile_triple'
-            },
-            {
-                level: 4,
-                damage: 63,
-                missiles: 3,
-                range: 12,
-                explosionRadius: 4,
-                cooldown: 850,
-                description: '爆炸范围+1，穿透+1',
-                visual: '飞弹穿透敌人继续飞行',
-                effect: 'missile_piercing'
-            },
-            {
-                level: 5,
-                damage: 77,
-                missiles: 6,
-                range: 14,
-                explosionRadius: 5,
-                cooldown: 800,
-                description: '飞弹+3，范围+2，爆炸范围+1',
-                visual: '6个飞弹密集发射',
-                effect: 'missile_six'
-            },
-            {
-                level: 6,
-                damage: 91,
-                missiles: 6,
-                range: 14,
-                explosionRadius: 6,
-                cooldown: 750,
-                description: '爆炸范围+1，穿透+2',
-                visual: '爆炸范围巨大，穿透多个敌人',
-                effect: 'missile_big_explosion'
-            },
-            {
-                level: 7,
-                damage: 109,
-                missiles: 8,
-                range: 16,
-                explosionRadius: 7,
-                cooldown: 700,
-                description: '飞弹+2，范围+2，智能追踪必中',
-                visual: '8个飞弹精准追踪',
-                effect: 'missile_smart'
-            },
-            {
-                level: 8,
-                damage: 130,
-                missiles: 10,
-                range: 18,
-                explosionRadius: 8,
-                cooldown: 600,
-                description: '满级！10个飞弹，智能追踪，穿透无限',
-                visual: '10个飞弹全覆盖，爆炸不断',
-                effect: 'missile_max',
-                evolution: {
-                    requiredPassive: 'explosion_radius',
-                    evolvedSkill: 'nuke_missiles',
-                    evolvedName: '核弹飞弹'
-                }
-            }
-        ],
-        
+        cooldown: 1000,
+        description: "发射1个追踪飞弹，爆炸范围2格",
+        visual: "小型飞弹，橙色尾焰",
+        effect: "missile_single",
+      },
+      {
+        level: 2,
+        damage: 42,
+        missiles: 2,
+        range: 10,
+        explosionRadius: 2,
+        cooldown: 950,
+        description: "飞弹+1，追踪速度+50%",
+        visual: "2个飞弹同时发射",
+        effect: "missile_double",
+      },
+      {
+        level: 3,
+        damage: 53,
+        missiles: 3,
+        range: 12,
+        explosionRadius: 3,
+        cooldown: 900,
+        description: "飞弹+1，范围+2格，爆炸范围+1",
+        visual: "3个飞弹，爆炸更大",
+        effect: "missile_triple",
+      },
+      {
+        level: 4,
+        damage: 63,
+        missiles: 3,
+        range: 12,
+        explosionRadius: 4,
+        cooldown: 850,
+        description: "爆炸范围+1，穿透+1",
+        visual: "飞弹穿透敌人继续飞行",
+        effect: "missile_piercing",
+      },
+      {
+        level: 5,
+        damage: 77,
+        missiles: 6,
+        range: 14,
+        explosionRadius: 5,
+        cooldown: 800,
+        description: "飞弹+3，范围+2，爆炸范围+1",
+        visual: "6个飞弹密集发射",
+        effect: "missile_six",
+      },
+      {
+        level: 6,
+        damage: 91,
+        missiles: 6,
+        range: 14,
+        explosionRadius: 6,
+        cooldown: 750,
+        description: "爆炸范围+1，穿透+2",
+        visual: "爆炸范围巨大，穿透多个敌人",
+        effect: "missile_big_explosion",
+      },
+      {
+        level: 7,
+        damage: 109,
+        missiles: 8,
+        range: 16,
+        explosionRadius: 7,
+        cooldown: 700,
+        description: "飞弹+2，范围+2，智能追踪必中",
+        visual: "8个飞弹精准追踪",
+        effect: "missile_smart",
+      },
+      {
+        level: 8,
+        damage: 130,
+        missiles: 10,
+        range: 18,
+        explosionRadius: 8,
+        cooldown: 600,
+        description: "满级！10个飞弹，智能追踪，穿透无限",
+        visual: "10个飞弹全覆盖，爆炸不断",
+        effect: "missile_max",
         evolution: {
-            id: 'nuke_missiles',
-            name: '核弹飞弹',
-            icon: '💥💥',
-            rarity: 'mythic',
-            damage: 500,
-            explosionRadius: 20,
-            missiles: 20,
-            description: '每发飞弹变成微型核弹，爆炸范围20格',
-            visual: '飞弹变成核弹，蘑菇云升起，辐射区域',
-            effects: ['nuke', 'radiation', 'massive_explosion']
-        }
+          requiredPassive: "explosion_radius",
+          evolvedSkill: "nuke_missiles",
+          evolvedName: "核弹飞弹",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "nuke_missiles",
+      name: "核弹飞弹",
+      icon: "💥💥",
+      rarity: "mythic",
+      damage: 500,
+      explosionRadius: 20,
+      missiles: 20,
+      description: "每发飞弹变成微型核弹，爆炸范围20格",
+      visual: "飞弹变成核弹，蘑菇云升起，辐射区域",
+      effects: ["nuke", "radiation", "massive_explosion"],
     },
-    
-    // 6. 黑洞吞噬
-    black_hole: {
-        id: 'black_hole',
-        name: '黑洞吞噬',
-        icon: '🌀',
-        type: 'control_aoe',
-        rarity: 'epic',
-        description: '生成黑洞吸入敌人并造成伤害',
-        
-        baseDamage: 15,
-        baseRange: 5,
-        baseCooldown: 8000,
+  },
+
+  // 6. 黑洞吞噬
+  black_hole: {
+    id: "black_hole",
+    name: "黑洞吞噬",
+    icon: "🌀",
+    type: "control_aoe",
+    rarity: "epic",
+    description: "生成黑洞吸入敌人并造成伤害",
+
+    baseDamage: 15,
+    baseRange: 5,
+    baseCooldown: 8000,
+    duration: 3000,
+    pullSpeed: 1,
+
+    damageFormula:
+      "最终伤害 = 基础伤害 × 每秒伤害次数 × 等级倍率 × (1 + 伤害加成%)",
+
+    levels: [
+      {
+        level: 1,
+        damage: 15,
+        range: 5,
         duration: 3000,
         pullSpeed: 1,
-        
-        damageFormula: '最终伤害 = 基础伤害 × 每秒伤害次数 × 等级倍率 × (1 + 伤害加成%)',
-        
-        levels: [
-            {
-                level: 1,
-                damage: 15,
-                range: 5,
-                duration: 3000,
-                pullSpeed: 1,
-                cooldown: 8000,
-                description: '生成黑洞，范围5格，持续3秒，吸入敌人',
-                visual: '小型黑色漩涡，紫色光效',
-                effect: 'black_hole_small'
-            },
-            {
-                level: 2,
-                damage: 18,
-                range: 8,
-                duration: 4000,
-                pullSpeed: 1.2,
-                cooldown: 7500,
-                description: '范围+3格，持续+1秒，吸入后爆炸(50伤害)',
-                visual: '黑洞变大，爆炸效果',
-                effect: 'black_hole_explode'
-            },
-            {
-                level: 3,
-                damage: 23,
-                range: 10,
-                duration: 5000,
-                pullSpeed: 1.4,
-                cooldown: 7000,
-                description: '范围+2格，持续+1秒，爆炸伤害提升至80',
-                visual: '黑洞更强，爆炸更大',
-                effect: 'black_hole_big'
-            },
-            {
-                level: 4,
-                damage: 28,
-                range: 12,
-                duration: 6000,
-                pullSpeed: 1.6,
-                cooldown: 6500,
-                description: '范围+2格，持续+1秒，可以吸入精英怪',
-                visual: '黑洞吸力更强，精英怪被拉入',
-                effect: 'black_hole_elite'
-            },
-            {
-                level: 5,
-                damage: 34,
-                range: 12,
-                duration: 7000,
-                pullSpeed: 1.8,
-                cooldown: 6000,
-                description: '持续+1秒，爆炸伤害+200%',
-                visual: '黑洞爆炸产生巨大冲击波',
-                effect: 'black_hole_mega'
-            },
-            {
-                level: 6,
-                damage: 41,
-                range: 15,
-                duration: 8000,
-                pullSpeed: 2,
-                cooldown: 5500,
-                description: '范围+3格，持续+1秒，可以吸入Boss',
-                visual: '巨型黑洞，Boss也被吸入',
-                effect: 'black_hole_boss'
-            },
-            {
-                level: 7,
-                damage: 50,
-                range: 18,
-                duration: 9000,
-                pullSpeed: 2.2,
-                cooldown: 5000,
-                description: '范围+3格，黑洞可以缓慢移动',
-                visual: '黑洞跟随玩家移动',
-                effect: 'black_hole_move'
-            },
-            {
-                level: 8,
-                damage: 60,
-                range: 20,
-                duration: 10000,
-                pullSpeed: 2.5,
-                cooldown: 4500,
-                description: '满级！范围20格，持续10秒，吞噬一切',
-                visual: '超大黑洞，全屏可见',
-                effect: 'black_hole_ultimate',
-                evolution: {
-                    requiredPassive: 'duration',
-                    evolvedSkill: 'dimensional_rift',
-                    evolvedName: '维度裂隙'
-                }
-            }
-        ],
-        
+        cooldown: 8000,
+        description: "生成黑洞，范围5格，持续3秒，吸入敌人",
+        visual: "小型黑色漩涡，紫色光效",
+        effect: "black_hole_small",
+      },
+      {
+        level: 2,
+        damage: 18,
+        range: 8,
+        duration: 4000,
+        pullSpeed: 1.2,
+        cooldown: 7500,
+        description: "范围+3格，持续+1秒，吸入后爆炸(50伤害)",
+        visual: "黑洞变大，爆炸效果",
+        effect: "black_hole_explode",
+      },
+      {
+        level: 3,
+        damage: 23,
+        range: 10,
+        duration: 5000,
+        pullSpeed: 1.4,
+        cooldown: 7000,
+        description: "范围+2格，持续+1秒，爆炸伤害提升至80",
+        visual: "黑洞更强，爆炸更大",
+        effect: "black_hole_big",
+      },
+      {
+        level: 4,
+        damage: 28,
+        range: 12,
+        duration: 6000,
+        pullSpeed: 1.6,
+        cooldown: 6500,
+        description: "范围+2格，持续+1秒，可以吸入精英怪",
+        visual: "黑洞吸力更强，精英怪被拉入",
+        effect: "black_hole_elite",
+      },
+      {
+        level: 5,
+        damage: 34,
+        range: 12,
+        duration: 7000,
+        pullSpeed: 1.8,
+        cooldown: 6000,
+        description: "持续+1秒，爆炸伤害+200%",
+        visual: "黑洞爆炸产生巨大冲击波",
+        effect: "black_hole_mega",
+      },
+      {
+        level: 6,
+        damage: 41,
+        range: 15,
+        duration: 8000,
+        pullSpeed: 2,
+        cooldown: 5500,
+        description: "范围+3格，持续+1秒，可以吸入Boss",
+        visual: "巨型黑洞，Boss也被吸入",
+        effect: "black_hole_boss",
+      },
+      {
+        level: 7,
+        damage: 50,
+        range: 18,
+        duration: 9000,
+        pullSpeed: 2.2,
+        cooldown: 5000,
+        description: "范围+3格，黑洞可以缓慢移动",
+        visual: "黑洞跟随玩家移动",
+        effect: "black_hole_move",
+      },
+      {
+        level: 8,
+        damage: 60,
+        range: 20,
+        duration: 10000,
+        pullSpeed: 2.5,
+        cooldown: 4500,
+        description: "满级！范围20格，持续10秒，吞噬一切",
+        visual: "超大黑洞，全屏可见",
+        effect: "black_hole_ultimate",
         evolution: {
-            id: 'dimensional_rift',
-            name: '维度裂隙',
-            icon: '🌀🌀',
-            rarity: 'mythic',
-            damage: 100,
-            holeCount: 3,
-            description: '同时存在3个黑洞，产生引力波',
-            visual: '3个黑洞互相旋转，引力波扭曲空间',
-            effects: ['triple_hole', 'gravity_wave', 'space_rift']
-        }
+          requiredPassive: "duration",
+          evolvedSkill: "dimensional_rift",
+          evolvedName: "维度裂隙",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "dimensional_rift",
+      name: "维度裂隙",
+      icon: "🌀🌀",
+      rarity: "mythic",
+      damage: 100,
+      holeCount: 3,
+      description: "同时存在3个黑洞，产生引力波",
+      visual: "3个黑洞互相旋转，引力波扭曲空间",
+      effects: ["triple_hole", "gravity_wave", "space_rift"],
     },
-    
-    // ==================== T2 特色技能 ====================
-    
-    // 7. 狙击射击
-    sniper_shot: {
-        id: 'sniper_shot',
-        name: '狙击射击',
-        icon: '🎯',
-        type: 'ranged_single',
-        rarity: 'rare',
-        description: '发射高伤害子弹，穿透直线敌人',
-        
-        baseDamage: 150,
-        baseRange: 20,
-        baseCooldown: 2000,
+  },
+
+  // ==================== T2 特色技能 ====================
+
+  // 7. 狙击射击
+  sniper_shot: {
+    id: "sniper_shot",
+    name: "狙击射击",
+    icon: "🎯",
+    type: "ranged_single",
+    rarity: "rare",
+    description: "发射高伤害子弹，穿透直线敌人",
+
+    baseDamage: 150,
+    baseRange: 20,
+    baseCooldown: 2000,
+    pierce: 3,
+
+    damageFormula:
+      "最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 暴击伤害%)(如果暴击)",
+
+    levels: [
+      {
+        level: 1,
+        damage: 150,
+        range: 20,
         pierce: 3,
-        
-        damageFormula: '最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 暴击伤害%)(如果暴击)',
-        
-        levels: [
-            {
-                level: 1,
-                damage: 150,
-                range: 20,
-                pierce: 3,
-                cooldown: 2000,
-                critChance: 0.1,
-                description: '发射1发子弹，穿透3个敌人，10%暴击率',
-                visual: '高速子弹，白色轨迹',
-                effect: 'bullet_single'
-            },
-            {
-                level: 2,
-                damage: 180,
-                range: 20,
-                pierce: 5,
-                cooldown: 1900,
-                critChance: 0.15,
-                description: '穿透+2，暴击率+5%',
-                visual: '子弹带蓝色光效',
-                effect: 'bullet_piercing'
-            },
-            {
-                level: 3,
-                damage: 225,
-                range: 22,
-                pierce: 8,
-                cooldown: 1800,
-                critChance: 0.2,
-                description: '穿透+3，暴击率+5%，伤害提升',
-                visual: '子弹更大，穿透痕迹明显',
-                effect: 'bullet_strong'
-            },
-            {
-                level: 4,
-                damage: 270,
-                range: 22,
-                pierce: 10,
-                cooldown: 1700,
-                critChance: 0.25,
-                description: '穿透+2，暴击率+5%',
-                visual: '子弹带金色暴击光效',
-                effect: 'bullet_crit'
-            },
-            {
-                level: 5,
-                damage: 338,
-                range: 25,
-                pierce: 12,
-                cooldown: 1600,
-                critChance: 0.3,
-                description: '每次2发子弹，穿透+2，暴击率+5%',
-                visual: '2发子弹同时发射',
-                effect: 'bullet_double'
-            },
-            {
-                level: 6,
-                damage: 405,
-                range: 25,
-                pierce: 15,
-                cooldown: 1500,
-                critChance: 0.4,
-                description: '穿透+3，暴击率+10%',
-                visual: '子弹带闪电特效',
-                effect: 'bullet_lightning'
-            },
-            {
-                level: 7,
-                damage: 506,
-                range: 28,
-                pierce: 20,
-                cooldown: 1400,
-                critChance: 0.5,
-                description: '每次3发子弹，穿透+5，暴击率+10%',
-                visual: '3发子弹呈扇形',
-                effect: 'bullet_triple'
-            },
-            {
-                level: 8,
-                damage: 608,
-                range: 30,
-                pierce: Infinity,
-                cooldown: 1200,
-                critChance: 0.6,
-                description: '满级！穿透无限，60%暴击率，暴击伤害×3',
-                visual: '子弹带彩虹光效，必定暴击闪光',
-                effect: 'bullet_ultimate',
-                evolution: {
-                    requiredPassive: 'fire_rate',
-                    evolvedSkill: 'laser_cannon',
-                    evolvedName: '激光炮'
-                }
-            }
-        ],
-        
+        cooldown: 2000,
+        critChance: 0.1,
+        description: "发射1发子弹，穿透3个敌人，10%暴击率",
+        visual: "高速子弹，白色轨迹",
+        effect: "bullet_single",
+      },
+      {
+        level: 2,
+        damage: 180,
+        range: 20,
+        pierce: 5,
+        cooldown: 1900,
+        critChance: 0.15,
+        description: "穿透+2，暴击率+5%",
+        visual: "子弹带蓝色光效",
+        effect: "bullet_piercing",
+      },
+      {
+        level: 3,
+        damage: 225,
+        range: 22,
+        pierce: 8,
+        cooldown: 1800,
+        critChance: 0.2,
+        description: "穿透+3，暴击率+5%，伤害提升",
+        visual: "子弹更大，穿透痕迹明显",
+        effect: "bullet_strong",
+      },
+      {
+        level: 4,
+        damage: 270,
+        range: 22,
+        pierce: 10,
+        cooldown: 1700,
+        critChance: 0.25,
+        description: "穿透+2，暴击率+5%",
+        visual: "子弹带金色暴击光效",
+        effect: "bullet_crit",
+      },
+      {
+        level: 5,
+        damage: 338,
+        range: 25,
+        pierce: 12,
+        cooldown: 1600,
+        critChance: 0.3,
+        description: "每次2发子弹，穿透+2，暴击率+5%",
+        visual: "2发子弹同时发射",
+        effect: "bullet_double",
+      },
+      {
+        level: 6,
+        damage: 405,
+        range: 25,
+        pierce: 15,
+        cooldown: 1500,
+        critChance: 0.4,
+        description: "穿透+3，暴击率+10%",
+        visual: "子弹带闪电特效",
+        effect: "bullet_lightning",
+      },
+      {
+        level: 7,
+        damage: 506,
+        range: 28,
+        pierce: 20,
+        cooldown: 1400,
+        critChance: 0.5,
+        description: "每次3发子弹，穿透+5，暴击率+10%",
+        visual: "3发子弹呈扇形",
+        effect: "bullet_triple",
+      },
+      {
+        level: 8,
+        damage: 608,
+        range: 30,
+        pierce: Infinity,
+        cooldown: 1200,
+        critChance: 0.6,
+        description: "满级！穿透无限，60%暴击率，暴击伤害×3",
+        visual: "子弹带彩虹光效，必定暴击闪光",
+        effect: "bullet_ultimate",
         evolution: {
-            id: 'laser_cannon',
-            name: '激光炮',
-            icon: '🎯🎯',
-            rarity: 'mythic',
-            damage: 500,
-            damagePerSecond: 500,
-            description: '发射持续激光，可以旋转扫射',
-            visual: '粗大的红色激光束，可以360度旋转',
-            effects: ['continuous_laser', 'rotate', 'piercing_all']
-        }
+          requiredPassive: "fire_rate",
+          evolvedSkill: "laser_cannon",
+          evolvedName: "激光炮",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "laser_cannon",
+      name: "激光炮",
+      icon: "🎯🎯",
+      rarity: "mythic",
+      damage: 500,
+      damagePerSecond: 500,
+      description: "发射持续激光，可以旋转扫射",
+      visual: "粗大的红色激光束，可以360度旋转",
+      effects: ["continuous_laser", "rotate", "piercing_all"],
     },
-    
-    // 8. 冰霜新星
-    frost_nova: {
-        id: 'frost_nova',
-        name: '冰霜新星',
-        icon: '❄️',
-        type: 'aoe_control',
-        rarity: 'rare',
-        description: '释放冰霜爆炸，冻结敌人',
-        
-        baseDamage: 20,
-        baseRange: 6,
-        baseCooldown: 3000,
+  },
+
+  // 8. 冰霜新星
+  frost_nova: {
+    id: "frost_nova",
+    name: "冰霜新星",
+    icon: "❄️",
+    type: "aoe_control",
+    rarity: "rare",
+    description: "释放冰霜爆炸，冻结敌人",
+
+    baseDamage: 20,
+    baseRange: 6,
+    baseCooldown: 3000,
+    freezeDuration: 1000,
+
+    damageFormula:
+      "最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 冰霜伤害%)",
+
+    levels: [
+      {
+        level: 1,
+        damage: 20,
+        range: 6,
         freezeDuration: 1000,
-        
-        damageFormula: '最终伤害 = 基础伤害 × 等级倍率 × (1 + 伤害加成%) × (1 + 冰霜伤害%)',
-        
-        levels: [
-            {
-                level: 1,
-                damage: 20,
-                range: 6,
-                freezeDuration: 1000,
-                cooldown: 3000,
-                description: '冰霜爆炸，冻结敌人1秒，范围6格',
-                visual: '蓝色冰霜扩散，敌人结冰',
-                effect: 'frost_small'
-            },
-            {
-                level: 2,
-                damage: 24,
-                range: 8,
-                freezeDuration: 2000,
-                cooldown: 2800,
-                description: '范围+2格，冻结+1秒，爆炸伤害',
-                visual: '冰霜范围扩大，敌人碎裂',
-                effect: 'frost_explode'
-            },
-            {
-                level: 3,
-                damage: 30,
-                range: 10,
-                freezeDuration: 3000,
-                cooldown: 2600,
-                description: '范围+2格，冻结+1秒，冰刺从地面突出',
-                visual: '地面突出冰刺，敌人被刺穿',
-                effect: 'ice_spikes'
-            },
-            {
-                level: 4,
-                damage: 36,
-                range: 10,
-                freezeDuration: 4000,
-                cooldown: 2400,
-                description: '冻结+1秒，冰霜区域持续减速50%',
-                visual: '地面结冰，敌人减速移动',
-                effect: 'frost_slow'
-            },
-            {
-                level: 5,
-                damage: 44,
-                range: 12,
-                freezeDuration: 5000,
-                cooldown: 2200,
-                description: '范围+2格，冻结+1秒',
-                visual: '大范围冰冻，敌人全被冻结',
-                effect: 'frost_large'
-            },
-            {
-                level: 6,
-                damage: 52,
-                range: 12,
-                freezeDuration: 6000,
-                cooldown: 2000,
-                description: '冻结+1秒，冰冻碎裂造成200%伤害',
-                visual: '冰块碎裂，巨大伤害数字',
-                effect: 'frost_shatter'
-            },
-            {
-                level: 7,
-                damage: 62,
-                range: 15,
-                freezeDuration: 7000,
-                cooldown: 1800,
-                description: '范围+3格，冻结+1秒',
-                visual: '超大范围冰冻，全屏蓝色',
-                effect: 'frost_huge'
-            },
-            {
-                level: 8,
-                damage: 74,
-                range: 15,
-                freezeDuration: 8000,
-                cooldown: 1500,
-                description: '满级！冻结8秒，冰碎伤害300%',
-                visual: '超长冻结，冰碎爆炸全屏',
-                effect: 'frost_ultimate',
-                evolution: {
-                    requiredPassive: 'frost_damage',
-                    evolvedSkill: 'absolute_zero',
-                    evolvedName: '绝对零度'
-                }
-            }
-        ],
-        
+        cooldown: 3000,
+        description: "冰霜爆炸，冻结敌人1秒，范围6格",
+        visual: "蓝色冰霜扩散，敌人结冰",
+        effect: "frost_small",
+      },
+      {
+        level: 2,
+        damage: 24,
+        range: 8,
+        freezeDuration: 2000,
+        cooldown: 2800,
+        description: "范围+2格，冻结+1秒，爆炸伤害",
+        visual: "冰霜范围扩大，敌人碎裂",
+        effect: "frost_explode",
+      },
+      {
+        level: 3,
+        damage: 30,
+        range: 10,
+        freezeDuration: 3000,
+        cooldown: 2600,
+        description: "范围+2格，冻结+1秒，冰刺从地面突出",
+        visual: "地面突出冰刺，敌人被刺穿",
+        effect: "ice_spikes",
+      },
+      {
+        level: 4,
+        damage: 36,
+        range: 10,
+        freezeDuration: 4000,
+        cooldown: 2400,
+        description: "冻结+1秒，冰霜区域持续减速50%",
+        visual: "地面结冰，敌人减速移动",
+        effect: "frost_slow",
+      },
+      {
+        level: 5,
+        damage: 44,
+        range: 12,
+        freezeDuration: 5000,
+        cooldown: 2200,
+        description: "范围+2格，冻结+1秒",
+        visual: "大范围冰冻，敌人全被冻结",
+        effect: "frost_large",
+      },
+      {
+        level: 6,
+        damage: 52,
+        range: 12,
+        freezeDuration: 6000,
+        cooldown: 2000,
+        description: "冻结+1秒，冰冻碎裂造成200%伤害",
+        visual: "冰块碎裂，巨大伤害数字",
+        effect: "frost_shatter",
+      },
+      {
+        level: 7,
+        damage: 62,
+        range: 15,
+        freezeDuration: 7000,
+        cooldown: 1800,
+        description: "范围+3格，冻结+1秒",
+        visual: "超大范围冰冻，全屏蓝色",
+        effect: "frost_huge",
+      },
+      {
+        level: 8,
+        damage: 74,
+        range: 15,
+        freezeDuration: 8000,
+        cooldown: 1500,
+        description: "满级！冻结8秒，冰碎伤害300%",
+        visual: "超长冻结，冰碎爆炸全屏",
+        effect: "frost_ultimate",
         evolution: {
-            id: 'absolute_zero',
-            name: '绝对零度',
-            icon: '❄️❄️',
-            rarity: 'mythic',
-            damage: 200,
-            freezeDuration: 10000,
-            description: '全屏冻结10秒，冻结期间受到伤害×5',
-            visual: '全屏瞬间结冰，敌人变成冰雕，碎裂时连锁爆炸',
-            effects: ['fullscreen_freeze', 'damage_x5', 'chain_explosion']
-        }
+          requiredPassive: "frost_damage",
+          evolvedSkill: "absolute_zero",
+          evolvedName: "绝对零度",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "absolute_zero",
+      name: "绝对零度",
+      icon: "❄️❄️",
+      rarity: "mythic",
+      damage: 200,
+      freezeDuration: 10000,
+      description: "全屏冻结10秒，冻结期间受到伤害×5",
+      visual: "全屏瞬间结冰，敌人变成冰雕，碎裂时连锁爆炸",
+      effects: ["fullscreen_freeze", "damage_x5", "chain_explosion"],
     },
-    
-    // 9. 死亡之握
-    death_grasp: {
-        id: 'death_grasp',
-        name: '死亡之握',
-        icon: '☠️',
-        type: 'dot_aoe',
-        rarity: 'rare',
-        description: '生成黑色能量场，持续伤害并吸取生命',
-        
-        baseDamage: 50,
-        baseRange: 4,
-        baseCooldown: 5000,
-        duration: 3000,
+  },
+
+  // 9. 死亡之握
+  death_grasp: {
+    id: "death_grasp",
+    name: "死亡之握",
+    icon: "☠️",
+    type: "dot_aoe",
+    rarity: "rare",
+    description: "生成黑色能量场，持续伤害并吸取生命",
+
+    baseDamage: 50,
+    baseRange: 4,
+    baseCooldown: 5000,
+    duration: 3000,
+    damagePerSecond: 50,
+
+    damageFormula: "最终伤害 = 每秒伤害 × 持续时间(秒) × (1 + 伤害加成%)",
+
+    levels: [
+      {
+        level: 1,
         damagePerSecond: 50,
-        
-        damageFormula: '最终伤害 = 每秒伤害 × 持续时间(秒) × (1 + 伤害加成%)',
-        
-        levels: [
-            {
-                level: 1,
-                damagePerSecond: 50,
-                range: 4,
-                duration: 3000,
-                cooldown: 5000,
-                description: '能量场持续3秒，每秒50伤害，敌人减速50%',
-                visual: '黑色能量场，紫色烟雾',
-                effect: 'dark_field'
-            },
-            {
-                level: 2,
-                damagePerSecond: 60,
-                range: 5,
-                duration: 4000,
-                cooldown: 4800,
-                description: '范围+1格，持续+1秒，吸血+10%',
-                visual: '能量场带红色吸血光效',
-                effect: 'dark_field_lifesteal'
-            },
-            {
-                level: 3,
-                damagePerSecond: 72,
-                range: 6,
-                duration: 5000,
-                cooldown: 4500,
-                description: '范围+1格，持续+1秒，敌人无法攻击',
-                visual: '能量场内敌人沉默',
-                effect: 'dark_field_silence'
-            },
-            {
-                level: 4,
-                damagePerSecond: 86,
-                range: 8,
-                duration: 6000,
-                cooldown: 4200,
-                description: '范围+2格，持续+1秒',
-                visual: '能量场明显扩大',
-                effect: 'dark_field_large'
-            },
-            {
-                level: 5,
-                damagePerSecond: 103,
-                range: 8,
-                duration: 7000,
-                cooldown: 4000,
-                description: '持续+1秒，每秒吸取生命恢复玩家',
-                visual: '生命从敌人流向玩家',
-                effect: 'dark_field_drain'
-            },
-            {
-                level: 6,
-                damagePerSecond: 124,
-                range: 10,
-                duration: 8000,
-                cooldown: 3800,
-                description: '范围+2格，持续+1秒',
-                visual: '超大能量场，持续更久',
-                effect: 'dark_field_huge'
-            },
-            {
-                level: 7,
-                damagePerSecond: 149,
-                range: 12,
-                duration: 9000,
-                cooldown: 3500,
-                description: '范围+2格，持续+1秒，吸取生命+30%',
-                visual: '强烈生命吸取效果',
-                effect: 'dark_field_drain_strong'
-            },
-            {
-                level: 8,
-                damagePerSecond: 179,
-                range: 12,
-                duration: 10000,
-                cooldown: 3000,
-                description: '满级！持续10秒，范围12格，吸血+50%',
-                visual: '巨型黑暗能量场，生命大量恢复',
-                effect: 'dark_field_ultimate',
-                evolution: {
-                    requiredPassive: 'duration',
-                    evolvedSkill: 'soul_reaping',
-                    evolvedName: '灵魂收割'
-                }
-            }
-        ],
-        
+        range: 4,
+        duration: 3000,
+        cooldown: 5000,
+        description: "能量场持续3秒，每秒50伤害，敌人减速50%",
+        visual: "黑色能量场，紫色烟雾",
+        effect: "dark_field",
+      },
+      {
+        level: 2,
+        damagePerSecond: 60,
+        range: 5,
+        duration: 4000,
+        cooldown: 4800,
+        description: "范围+1格，持续+1秒，吸血+10%",
+        visual: "能量场带红色吸血光效",
+        effect: "dark_field_lifesteal",
+      },
+      {
+        level: 3,
+        damagePerSecond: 72,
+        range: 6,
+        duration: 5000,
+        cooldown: 4500,
+        description: "范围+1格，持续+1秒，敌人无法攻击",
+        visual: "能量场内敌人沉默",
+        effect: "dark_field_silence",
+      },
+      {
+        level: 4,
+        damagePerSecond: 86,
+        range: 8,
+        duration: 6000,
+        cooldown: 4200,
+        description: "范围+2格，持续+1秒",
+        visual: "能量场明显扩大",
+        effect: "dark_field_large",
+      },
+      {
+        level: 5,
+        damagePerSecond: 103,
+        range: 8,
+        duration: 7000,
+        cooldown: 4000,
+        description: "持续+1秒，每秒吸取生命恢复玩家",
+        visual: "生命从敌人流向玩家",
+        effect: "dark_field_drain",
+      },
+      {
+        level: 6,
+        damagePerSecond: 124,
+        range: 10,
+        duration: 8000,
+        cooldown: 3800,
+        description: "范围+2格，持续+1秒",
+        visual: "超大能量场，持续更久",
+        effect: "dark_field_huge",
+      },
+      {
+        level: 7,
+        damagePerSecond: 149,
+        range: 12,
+        duration: 9000,
+        cooldown: 3500,
+        description: "范围+2格，持续+1秒，吸取生命+30%",
+        visual: "强烈生命吸取效果",
+        effect: "dark_field_drain_strong",
+      },
+      {
+        level: 8,
+        damagePerSecond: 179,
+        range: 12,
+        duration: 10000,
+        cooldown: 3000,
+        description: "满级！持续10秒，范围12格，吸血+50%",
+        visual: "巨型黑暗能量场，生命大量恢复",
+        effect: "dark_field_ultimate",
         evolution: {
-            id: 'soul_reaping',
-            name: '灵魂收割',
-            icon: '☠️☠️',
-            rarity: 'mythic',
-            damagePerSecond: 500,
-            range: 20,
-            description: '范围20格，直接秒杀非Boss敌人',
-            visual: '黑色死神降临，触碰即死，Boss受到30%最大生命伤害',
-            effects: ['instant_kill', 'boss_damage_30%', 'mass_lifesteal']
-        }
+          requiredPassive: "duration",
+          evolvedSkill: "soul_reaping",
+          evolvedName: "灵魂收割",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "soul_reaping",
+      name: "灵魂收割",
+      icon: "☠️☠️",
+      rarity: "mythic",
+      damagePerSecond: 500,
+      range: 20,
+      description: "范围20格，直接秒杀非Boss敌人",
+      visual: "黑色死神降临，触碰即死，Boss受到30%最大生命伤害",
+      effects: ["instant_kill", "boss_damage_30%", "mass_lifesteal"],
     },
-    
-    // ==================== T3 辅助技能 ====================
-    
-    // 10. 神圣护盾
-    holy_shield: {
-        id: 'holy_shield',
-        name: '神圣护盾',
-        icon: '🛡️',
-        type: 'defense',
-        rarity: 'rare',
-        description: '生成护盾抵挡伤害，破裂时爆炸',
-        
-        baseShieldHP: 100,
-        baseDuration: 3000,
-        baseCooldown: 15000,
-        
-        levels: [
-            {
-                level: 1,
-                shieldHP: 100,
-                duration: 3000,
-                cooldown: 15000,
-                description: '抵挡100伤害，持续3秒',
-                visual: '金色半透明护盾',
-                effect: 'shield_gold'
-            },
-            {
-                level: 2,
-                shieldHP: 200,
-                duration: 5000,
-                cooldown: 14000,
-                description: '护盾+100，持续+2秒，反弹50%伤害',
-                visual: '护盾更厚，反弹光效',
-                effect: 'shield_reflect'
-            },
-            {
-                level: 3,
-                shieldHP: 300,
-                duration: 7000,
-                cooldown: 13000,
-                description: '护盾+100，持续+2秒，反弹100%',
-                visual: '护盾强烈反光',
-                effect: 'shield_reflect_full'
-            },
-            {
-                level: 4,
-                shieldHP: 400,
-                duration: 8000,
-                cooldown: 12000,
-                description: '护盾+100，持续+1秒',
-                visual: '护盾更大更厚',
-                effect: 'shield_large'
-            },
-            {
-                level: 5,
-                shieldHP: 500,
-                duration: 9000,
-                cooldown: 11000,
-                description: '护盾破裂时爆炸(200伤害，范围5格)',
-                visual: '护盾破裂金色爆炸',
-                effect: 'shield_explode'
-            },
-            {
-                level: 6,
-                shieldHP: 600,
-                duration: 10000,
-                cooldown: 10000,
-                description: '护盾+100，爆炸伤害+100%',
-                visual: '爆炸范围更大',
-                effect: 'shield_explode_big'
-            },
-            {
-                level: 7,
-                shieldHP: 800,
-                duration: 12000,
-                cooldown: 9000,
-                description: '护盾+200，持续+2秒',
-                visual: '巨型护盾，持续更久',
-                effect: 'shield_huge'
-            },
-            {
-                level: 8,
-                shieldHP: 1000,
-                duration: 15000,
-                cooldown: 8000,
-                description: '满级！护盾破裂时全屏爆炸(99999伤害)',
-                visual: '护盾破裂时产生核爆效果',
-                effect: 'shield_nuke',
-                evolution: {
-                    requiredPassive: 'armor',
-                    evolvedSkill: 'invincible_field',
-                    evolvedName: '无敌领域'
-                }
-            }
-        ],
-        
+  },
+
+  // ==================== T3 辅助技能 ====================
+
+  // 10. 神圣护盾
+  holy_shield: {
+    id: "holy_shield",
+    name: "神圣护盾",
+    icon: "🛡️",
+    type: "defense",
+    rarity: "rare",
+    description: "生成护盾抵挡伤害，破裂时爆炸",
+
+    baseShieldHP: 100,
+    baseDuration: 3000,
+    baseCooldown: 15000,
+
+    levels: [
+      {
+        level: 1,
+        shieldHP: 100,
+        duration: 3000,
+        cooldown: 15000,
+        description: "抵挡100伤害，持续3秒",
+        visual: "金色半透明护盾",
+        effect: "shield_gold",
+      },
+      {
+        level: 2,
+        shieldHP: 200,
+        duration: 5000,
+        cooldown: 14000,
+        description: "护盾+100，持续+2秒，反弹50%伤害",
+        visual: "护盾更厚，反弹光效",
+        effect: "shield_reflect",
+      },
+      {
+        level: 3,
+        shieldHP: 300,
+        duration: 7000,
+        cooldown: 13000,
+        description: "护盾+100，持续+2秒，反弹100%",
+        visual: "护盾强烈反光",
+        effect: "shield_reflect_full",
+      },
+      {
+        level: 4,
+        shieldHP: 400,
+        duration: 8000,
+        cooldown: 12000,
+        description: "护盾+100，持续+1秒",
+        visual: "护盾更大更厚",
+        effect: "shield_large",
+      },
+      {
+        level: 5,
+        shieldHP: 500,
+        duration: 9000,
+        cooldown: 11000,
+        description: "护盾破裂时爆炸(200伤害，范围5格)",
+        visual: "护盾破裂金色爆炸",
+        effect: "shield_explode",
+      },
+      {
+        level: 6,
+        shieldHP: 600,
+        duration: 10000,
+        cooldown: 10000,
+        description: "护盾+100，爆炸伤害+100%",
+        visual: "爆炸范围更大",
+        effect: "shield_explode_big",
+      },
+      {
+        level: 7,
+        shieldHP: 800,
+        duration: 12000,
+        cooldown: 9000,
+        description: "护盾+200，持续+2秒",
+        visual: "巨型护盾，持续更久",
+        effect: "shield_huge",
+      },
+      {
+        level: 8,
+        shieldHP: 1000,
+        duration: 15000,
+        cooldown: 8000,
+        description: "满级！护盾破裂时全屏爆炸(99999伤害)",
+        visual: "护盾破裂时产生核爆效果",
+        effect: "shield_nuke",
         evolution: {
-            id: 'invincible_field',
-            name: '无敌领域',
-            icon: '🛡️🛡️',
-            rarity: 'mythic',
-            duration: 15000,
-            description: '15秒内完全无敌，触碰护盾的敌人被弹飞',
-            visual: '玩家被金色光环包围，敌人触碰被弹飞爆炸',
-            effects: ['invincible', 'knockback_aura', 'nuke_explosion']
-        }
+          requiredPassive: "armor",
+          evolvedSkill: "invincible_field",
+          evolvedName: "无敌领域",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "invincible_field",
+      name: "无敌领域",
+      icon: "🛡️🛡️",
+      rarity: "mythic",
+      duration: 15000,
+      description: "15秒内完全无敌，触碰护盾的敌人被弹飞",
+      visual: "玩家被金色光环包围，敌人触碰被弹飞爆炸",
+      effects: ["invincible", "knockback_aura", "nuke_explosion"],
     },
-    
-    // 11. 生命汲取
-    life_drain: {
-        id: 'life_drain',
-        name: '生命汲取',
-        icon: '💚',
-        type: 'sustain',
-        rarity: 'uncommon',
-        description: '每秒恢复生命，近战范围内额外吸血',
-        
-        baseHealPerSecond: 5,
-        baseRange: 2,
-        
-        levels: [
-            {
-                level: 1,
-                healPerSecond: 5,
-                range: 2,
-                description: '每秒恢复5HP，近战范围2格',
-                visual: '绿色治疗数字跳动',
-                effect: 'heal_green'
-            },
-            {
-                level: 2,
-                healPerSecond: 10,
-                range: 3,
-                description: '恢复+5/秒，范围+1格',
-                visual: '治疗数字更大',
-                effect: 'heal_strong'
-            },
-            {
-                level: 3,
-                healPerSecond: 20,
-                range: 4,
-                lifeSteal: 0.05,
-                description: '恢复+10/秒，范围+1格，吸血+5%',
-                visual: '绿色光环扩散',
-                effect: 'heal_aura'
-            },
-            {
-                level: 4,
-                healPerSecond: 30,
-                range: 5,
-                lifeSteal: 0.1,
-                description: '恢复+10/秒，范围+1格，吸血+5%',
-                visual: '光环更大，吸血效果明显',
-                effect: 'heal_aura_large'
-            },
-            {
-                level: 5,
-                healPerSecond: 50,
-                range: 6,
-                lifeSteal: 0.15,
-                description: '恢复+20/秒，范围+1格，吸血+5%',
-                visual: '强烈绿色治疗光环',
-                effect: 'heal_aura_intense'
-            },
-            {
-                level: 6,
-                healPerSecond: 70,
-                range: 7,
-                lifeSteal: 0.2,
-                description: '恢复+20/秒，范围+1格，吸血+5%',
-                visual: '治疗数字密集跳动',
-                effect: 'heal_max'
-            },
-            {
-                level: 7,
-                healPerSecond: 80,
-                range: 8,
-                lifeSteal: 0.25,
-                description: '恢复+10/秒，范围+1格，吸血+5%',
-                visual: '超大治疗光环',
-                effect: 'heal_ultimate'
-            },
-            {
-                level: 8,
-                healPerSecond: 100,
-                range: 10,
-                lifeSteal: 0.3,
-                description: '满级！每秒恢复100HP，吸血30%',
-                visual: '玩家被绿色生命光环包围',
-                effect: 'heal_god'
-            }
-        ]
-    },
-    
-    // 12. 星辰坠落
-    starfall: {
-        id: 'starfall',
-        name: '星辰坠落',
-        icon: '🌟',
-        type: 'random_aoe',
-        rarity: 'uncommon',
-        description: '星星从天而降，随机轰炸敌人',
-        
-        baseDamage: 60,
-        baseRange: 3,
-        baseCooldown: 4000,
-        starCount: 3,
-        
-        levels: [
-            {
-                level: 1,
-                damage: 60,
-                stars: 3,
-                cooldown: 4000,
-                description: '每次掉落3颗星星，随机轰炸',
-                visual: '小星星掉落，白色闪光',
-                effect: 'star_small'
-            },
-            {
-                level: 2,
-                damage: 72,
-                stars: 4,
-                cooldown: 3800,
-                description: '星星+1，有追踪效果',
-                visual: '星星追踪敌人',
-                effect: 'star_homing'
-            },
-            {
-                level: 3,
-                damage: 90,
-                stars: 6,
-                cooldown: 3600,
-                description: '星星+2，爆炸范围+100%',
-                visual: '星星爆炸产生冲击波',
-                effect: 'star_explosion'
-            },
-            {
-                level: 4,
-                damage: 108,
-                stars: 8,
-                cooldown: 3400,
-                description: '星星+2，带眩晕效果(0.5秒)',
-                visual: '星星带金色眩晕',
-                effect: 'star_stun'
-            },
-            {
-                level: 5,
-                damage: 132,
-                stars: 10,
-                cooldown: 3200,
-                description: '星星+2，爆炸范围更大',
-                visual: '10颗星星密集轰炸',
-                effect: 'star_rain'
-            },
-            {
-                level: 6,
-                damage: 158,
-                stars: 15,
-                cooldown: 3000,
-                description: '星星+5，眩晕+0.5秒',
-                visual: '星星雨，眩晕不断',
-                effect: 'star_rain_intense'
-            },
-            {
-                level: 7,
-                damage: 190,
-                stars: 20,
-                cooldown: 2800,
-                description: '星星+5，范围覆盖大半个屏幕',
-                visual: '20颗星星同时掉落',
-                effect: 'star_meteor'
-            },
-            {
-                level: 8,
-                damage: 228,
-                stars: 30,
-                cooldown: 2500,
-                description: '满级！30颗星星全屏随机轰炸',
-                visual: '星星暴雨，全屏爆炸闪光',
-                effect: 'star_meteor_storm',
-                evolution: {
-                    requiredPassive: 'cooldown_reduction',
-                    evolvedSkill: 'starburst',
-                    evolvedName: '星爆'
-                }
-            }
-        ],
-        
+  },
+
+  // 11. 生命汲取
+  life_drain: {
+    id: "life_drain",
+    name: "生命汲取",
+    icon: "💚",
+    type: "sustain",
+    rarity: "uncommon",
+    description: "每秒恢复生命，近战范围内额外吸血",
+
+    baseHealPerSecond: 5,
+    baseRange: 2,
+
+    levels: [
+      {
+        level: 1,
+        healPerSecond: 5,
+        range: 2,
+        description: "每秒恢复5HP，近战范围2格",
+        visual: "绿色治疗数字跳动",
+        effect: "heal_green",
+      },
+      {
+        level: 2,
+        healPerSecond: 10,
+        range: 3,
+        description: "恢复+5/秒，范围+1格",
+        visual: "治疗数字更大",
+        effect: "heal_strong",
+      },
+      {
+        level: 3,
+        healPerSecond: 20,
+        range: 4,
+        lifeSteal: 0.05,
+        description: "恢复+10/秒，范围+1格，吸血+5%",
+        visual: "绿色光环扩散",
+        effect: "heal_aura",
+      },
+      {
+        level: 4,
+        healPerSecond: 30,
+        range: 5,
+        lifeSteal: 0.1,
+        description: "恢复+10/秒，范围+1格，吸血+5%",
+        visual: "光环更大，吸血效果明显",
+        effect: "heal_aura_large",
+      },
+      {
+        level: 5,
+        healPerSecond: 50,
+        range: 6,
+        lifeSteal: 0.15,
+        description: "恢复+20/秒，范围+1格，吸血+5%",
+        visual: "强烈绿色治疗光环",
+        effect: "heal_aura_intense",
+      },
+      {
+        level: 6,
+        healPerSecond: 70,
+        range: 7,
+        lifeSteal: 0.2,
+        description: "恢复+20/秒，范围+1格，吸血+5%",
+        visual: "治疗数字密集跳动",
+        effect: "heal_max",
+      },
+      {
+        level: 7,
+        healPerSecond: 80,
+        range: 8,
+        lifeSteal: 0.25,
+        description: "恢复+10/秒，范围+1格，吸血+5%",
+        visual: "超大治疗光环",
+        effect: "heal_ultimate",
+      },
+      {
+        level: 8,
+        healPerSecond: 100,
+        range: 10,
+        lifeSteal: 0.3,
+        description: "满级！每秒恢复100HP，吸血30%",
+        visual: "玩家被绿色生命光环包围",
+        effect: "heal_god",
+      },
+    ],
+  },
+
+  // 12. 星辰坠落
+  starfall: {
+    id: "starfall",
+    name: "星辰坠落",
+    icon: "🌟",
+    type: "random_aoe",
+    rarity: "uncommon",
+    description: "星星从天而降，随机轰炸敌人",
+
+    baseDamage: 60,
+    baseRange: 3,
+    baseCooldown: 4000,
+    starCount: 3,
+
+    levels: [
+      {
+        level: 1,
+        damage: 60,
+        stars: 3,
+        cooldown: 4000,
+        description: "每次掉落3颗星星，随机轰炸",
+        visual: "小星星掉落，白色闪光",
+        effect: "star_small",
+      },
+      {
+        level: 2,
+        damage: 72,
+        stars: 4,
+        cooldown: 3800,
+        description: "星星+1，有追踪效果",
+        visual: "星星追踪敌人",
+        effect: "star_homing",
+      },
+      {
+        level: 3,
+        damage: 90,
+        stars: 6,
+        cooldown: 3600,
+        description: "星星+2，爆炸范围+100%",
+        visual: "星星爆炸产生冲击波",
+        effect: "star_explosion",
+      },
+      {
+        level: 4,
+        damage: 108,
+        stars: 8,
+        cooldown: 3400,
+        description: "星星+2，带眩晕效果(0.5秒)",
+        visual: "星星带金色眩晕",
+        effect: "star_stun",
+      },
+      {
+        level: 5,
+        damage: 132,
+        stars: 10,
+        cooldown: 3200,
+        description: "星星+2，爆炸范围更大",
+        visual: "10颗星星密集轰炸",
+        effect: "star_rain",
+      },
+      {
+        level: 6,
+        damage: 158,
+        stars: 15,
+        cooldown: 3000,
+        description: "星星+5，眩晕+0.5秒",
+        visual: "星星雨，眩晕不断",
+        effect: "star_rain_intense",
+      },
+      {
+        level: 7,
+        damage: 190,
+        stars: 20,
+        cooldown: 2800,
+        description: "星星+5，范围覆盖大半个屏幕",
+        visual: "20颗星星同时掉落",
+        effect: "star_meteor",
+      },
+      {
+        level: 8,
+        damage: 228,
+        stars: 30,
+        cooldown: 2500,
+        description: "满级！30颗星星全屏随机轰炸",
+        visual: "星星暴雨，全屏爆炸闪光",
+        effect: "star_meteor_storm",
         evolution: {
-            id: 'starburst',
-            name: '星爆',
-            icon: '🌟🌟',
-            rarity: 'mythic',
-            damage: 500,
-            starsPerSecond: 50,
-            duration: 15000,
-            description: '流星雨持续15秒，每秒50颗流星',
-            visual: '全屏流星雨，连锁爆炸，持续不断',
-            effects: ['meteor_shower', 'chain_explosion', '15s_duration']
-        }
+          requiredPassive: "cooldown_reduction",
+          evolvedSkill: "starburst",
+          evolvedName: "星爆",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "starburst",
+      name: "星爆",
+      icon: "🌟🌟",
+      rarity: "mythic",
+      damage: 500,
+      starsPerSecond: 50,
+      duration: 15000,
+      description: "流星雨持续15秒，每秒50颗流星",
+      visual: "全屏流星雨，连锁爆炸，持续不断",
+      effects: ["meteor_shower", "chain_explosion", "15s_duration"],
     },
-    
-    // ==================== 特色技能 ====================
-    
-    // 13. 幸运轮盘
-    lucky_wheel: {
-        id: 'lucky_wheel',
-        name: '幸运轮盘',
-        icon: '🎰',
-        type: 'random_buff',
-        rarity: 'epic',
-        description: '随机获得一种增益效果',
-        
-        baseCooldown: 30000,
-        
-        possibleEffects: [
-            { name: '伤害×10', chance: 0.10, effect: 'damage_x10' },
-            { name: '攻速×5', chance: 0.15, effect: 'attackspeed_x5' },
-            { name: '全屏爆炸', chance: 0.05, effect: 'fullscreen_explosion' },
-            { name: '生命恢复×10', chance: 0.20, effect: 'regen_x10' },
-            { name: '召唤分身', chance: 0.10, effect: 'summon_clone' },
-            { name: '无效果', chance: 0.40, effect: 'nothing' }
-        ],
-        
-        levels: [
-            {
-                level: 1,
-                cooldown: 30000,
-                description: '每30秒转一次轮盘，40%概率无效果',
-                visual: '彩色轮盘旋转',
-                effect: 'wheel_spin'
-            },
-            {
-                level: 2,
-                cooldown: 20000,
-                goodChanceBonus: 0.20,
-                description: '每20秒转一次，好效果概率+20%',
-                visual: '轮盘发光',
-                effect: 'wheel_glow'
-            },
-            {
-                level: 3,
-                cooldown: 15000,
-                goodChanceBonus: 0.50,
-                description: '每15秒转一次，好效果概率+50%',
-                visual: '轮盘金光闪闪',
-                effect: 'wheel_gold'
-            },
-            {
-                level: 4,
-                cooldown: 12000,
-                guaranteed: true,
-                description: '每12秒转一次，必定获得好效果',
-                visual: '轮盘必中特效',
-                effect: 'wheel_guaranteed'
-            },
-            {
-                level: 5,
-                cooldown: 10000,
-                doubleEffect: 0.30,
-                description: '每10秒转一次，30%概率获得双重效果',
-                visual: '两个轮盘同时转',
-                effect: 'wheel_double'
-            },
-            {
-                level: 6,
-                cooldown: 8000,
-                doubleEffect: 0.50,
-                description: '每8秒转一次，50%概率双重效果',
-                visual: '轮盘快速旋转',
-                effect: 'wheel_fast'
-            },
-            {
-                level: 7,
-                cooldown: 6000,
-                tripleEffect: 0.20,
-                description: '每6秒转一次，20%概率三重效果',
-                visual: '三个轮盘',
-                effect: 'wheel_triple'
-            },
-            {
-                level: 8,
-                cooldown: 5000,
-                godChance: 0.30,
-                description: '满级！每5秒转一次，30%概率神级效果',
-                visual: '轮盘闪耀神圣光芒',
-                effect: 'wheel_god',
-                evolution: {
-                    requiredPassive: 'crit_chance',
-                    evolvedSkill: 'wheel_of_fate',
-                    evolvedName: '命运之轮'
-                }
-            }
-        ],
-        
+  },
+
+  // ==================== 特色技能 ====================
+
+  // 13. 幸运轮盘
+  lucky_wheel: {
+    id: "lucky_wheel",
+    name: "幸运轮盘",
+    icon: "🎰",
+    type: "random_buff",
+    rarity: "epic",
+    description: "随机获得一种增益效果",
+
+    baseCooldown: 30000,
+
+    possibleEffects: [
+      { name: "伤害×10", chance: 0.1, effect: "damage_x10" },
+      { name: "攻速×5", chance: 0.15, effect: "attackspeed_x5" },
+      { name: "全屏爆炸", chance: 0.05, effect: "fullscreen_explosion" },
+      { name: "生命恢复×10", chance: 0.2, effect: "regen_x10" },
+      { name: "召唤分身", chance: 0.1, effect: "summon_clone" },
+      { name: "无效果", chance: 0.4, effect: "nothing" },
+    ],
+
+    levels: [
+      {
+        level: 1,
+        cooldown: 30000,
+        description: "每30秒转一次轮盘，40%概率无效果",
+        visual: "彩色轮盘旋转",
+        effect: "wheel_spin",
+      },
+      {
+        level: 2,
+        cooldown: 20000,
+        goodChanceBonus: 0.2,
+        description: "每20秒转一次，好效果概率+20%",
+        visual: "轮盘发光",
+        effect: "wheel_glow",
+      },
+      {
+        level: 3,
+        cooldown: 15000,
+        goodChanceBonus: 0.5,
+        description: "每15秒转一次，好效果概率+50%",
+        visual: "轮盘金光闪闪",
+        effect: "wheel_gold",
+      },
+      {
+        level: 4,
+        cooldown: 12000,
+        guaranteed: true,
+        description: "每12秒转一次，必定获得好效果",
+        visual: "轮盘必中特效",
+        effect: "wheel_guaranteed",
+      },
+      {
+        level: 5,
+        cooldown: 10000,
+        doubleEffect: 0.3,
+        description: "每10秒转一次，30%概率获得双重效果",
+        visual: "两个轮盘同时转",
+        effect: "wheel_double",
+      },
+      {
+        level: 6,
+        cooldown: 8000,
+        doubleEffect: 0.5,
+        description: "每8秒转一次，50%概率双重效果",
+        visual: "轮盘快速旋转",
+        effect: "wheel_fast",
+      },
+      {
+        level: 7,
+        cooldown: 6000,
+        tripleEffect: 0.2,
+        description: "每6秒转一次，20%概率三重效果",
+        visual: "三个轮盘",
+        effect: "wheel_triple",
+      },
+      {
+        level: 8,
+        cooldown: 5000,
+        godChance: 0.3,
+        description: "满级！每5秒转一次，30%概率神级效果",
+        visual: "轮盘闪耀神圣光芒",
+        effect: "wheel_god",
         evolution: {
-            id: 'wheel_of_fate',
-            name: '命运之轮',
-            icon: '🎰🎰',
-            rarity: 'mythic',
-            cooldown: 3000,
-            wheelCount: 3,
-            description: '同时转3个轮盘，效果可叠加',
-            visual: '3个巨型轮盘同时旋转，金光闪耀',
-            effects: ['triple_wheel', 'stackable', 'permanent_buff_chance']
-        }
+          requiredPassive: "crit_chance",
+          evolvedSkill: "wheel_of_fate",
+          evolvedName: "命运之轮",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "wheel_of_fate",
+      name: "命运之轮",
+      icon: "🎰🎰",
+      rarity: "mythic",
+      cooldown: 3000,
+      wheelCount: 3,
+      description: "同时转3个轮盘，效果可叠加",
+      visual: "3个巨型轮盘同时旋转，金光闪耀",
+      effects: ["triple_wheel", "stackable", "permanent_buff_chance"],
     },
-    
-    // 14. 镜像分身
-    mirror_clone: {
-        id: 'mirror_clone',
-        name: '镜像分身',
-        icon: '👥',
-        type: 'summon',
-        rarity: 'epic',
-        description: '召唤分身协助战斗',
-        
-        baseCloneCount: 1,
-        baseDuration: 10000,
-        cloneDamagePercent: 0.5,
-        
-        levels: [
-            {
-                level: 1,
-                clones: 1,
-                duration: 10000,
-                damagePercent: 0.5,
-                description: '召唤1个分身，持续10秒，50%伤害',
-                visual: '半透明分身出现',
-                effect: 'clone_single'
-            },
-            {
-                level: 2,
-                clones: 2,
-                duration: 20000,
-                damagePercent: 0.75,
-                description: '分身+1，持续+10秒，75%伤害',
-                visual: '2个分身更清晰',
-                effect: 'clone_double'
-            },
-            {
-                level: 3,
-                clones: 3,
-                duration: 30000,
-                damagePercent: 1.0,
-                description: '分身+1，持续+10秒，100%伤害，分身带技能',
-                visual: '3个分身使用相同技能',
-                effect: 'clone_skills'
-            },
-            {
-                level: 4,
-                clones: 3,
-                duration: 45000,
-                damagePercent: 1.0,
-                description: '持续+15秒，分身可以进化',
-                visual: '分身获得强化',
-                effect: 'clone_evolved'
-            },
-            {
-                level: 5,
-                clones: 5,
-                duration: 60000,
-                damagePercent: 1.0,
-                description: '分身+2，持续+15秒',
-                visual: '5个分身协同作战',
-                effect: 'clone_army'
-            },
-            {
-                level: 6,
-                clones: 5,
-                duration: 90000,
-                damagePercent: 1.2,
-                description: '持续+30秒，伤害+20%',
-                visual: '分身带增益光环',
-                effect: 'clone_buffed'
-            },
-            {
-                level: 7,
-                clones: 8,
-                duration: 120000,
-                damagePercent: 1.5,
-                description: '分身+3，持续+30秒，伤害+50%',
-                visual: '8个分身形成战阵',
-                effect: 'clone_formation'
-            },
-            {
-                level: 8,
-                clones: 10,
-                duration: 120000,
-                damagePercent: 2.0,
-                description: '满级！10个分身，持续120秒，200%伤害',
-                visual: '10个分身各自独立攻击',
-                effect: 'clone_legion',
-                evolution: {
-                    requiredPassive: 'duration',
-                    evolvedSkill: 'clone_legion',
-                    evolvedName: '军团'
-                }
-            }
-        ],
-        
+  },
+
+  // 14. 镜像分身
+  mirror_clone: {
+    id: "mirror_clone",
+    name: "镜像分身",
+    icon: "👥",
+    type: "summon",
+    rarity: "epic",
+    description: "召唤分身协助战斗",
+
+    baseCloneCount: 1,
+    baseDuration: 10000,
+    cloneDamagePercent: 0.5,
+
+    levels: [
+      {
+        level: 1,
+        clones: 1,
+        duration: 10000,
+        damagePercent: 0.5,
+        description: "召唤1个分身，持续10秒，50%伤害",
+        visual: "半透明分身出现",
+        effect: "clone_single",
+      },
+      {
+        level: 2,
+        clones: 2,
+        duration: 20000,
+        damagePercent: 0.75,
+        description: "分身+1，持续+10秒，75%伤害",
+        visual: "2个分身更清晰",
+        effect: "clone_double",
+      },
+      {
+        level: 3,
+        clones: 3,
+        duration: 30000,
+        damagePercent: 1.0,
+        description: "分身+1，持续+10秒，100%伤害，分身带技能",
+        visual: "3个分身使用相同技能",
+        effect: "clone_skills",
+      },
+      {
+        level: 4,
+        clones: 3,
+        duration: 45000,
+        damagePercent: 1.0,
+        description: "持续+15秒，分身可以进化",
+        visual: "分身获得强化",
+        effect: "clone_evolved",
+      },
+      {
+        level: 5,
+        clones: 5,
+        duration: 60000,
+        damagePercent: 1.0,
+        description: "分身+2，持续+15秒",
+        visual: "5个分身协同作战",
+        effect: "clone_army",
+      },
+      {
+        level: 6,
+        clones: 5,
+        duration: 90000,
+        damagePercent: 1.2,
+        description: "持续+30秒，伤害+20%",
+        visual: "分身带增益光环",
+        effect: "clone_buffed",
+      },
+      {
+        level: 7,
+        clones: 8,
+        duration: 120000,
+        damagePercent: 1.5,
+        description: "分身+3，持续+30秒，伤害+50%",
+        visual: "8个分身形成战阵",
+        effect: "clone_formation",
+      },
+      {
+        level: 8,
+        clones: 10,
+        duration: 120000,
+        damagePercent: 2.0,
+        description: "满级！10个分身，持续120秒，200%伤害",
+        visual: "10个分身各自独立攻击",
+        effect: "clone_legion",
         evolution: {
-            id: 'clone_legion',
-            name: '军团',
-            icon: '👥👥',
-            rarity: 'mythic',
-            cloneCount: 100,
-            description: '100个分身，分身死亡时爆炸',
-            visual: '百人军团，分身死亡产生爆炸',
-            effects: ['hundred_clones', 'death_explosion', 'command_focus']
-        }
+          requiredPassive: "duration",
+          evolvedSkill: "clone_legion",
+          evolvedName: "军团",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "clone_legion",
+      name: "军团",
+      icon: "👥👥",
+      rarity: "mythic",
+      cloneCount: 100,
+      description: "100个分身，分身死亡时爆炸",
+      visual: "百人军团，分身死亡产生爆炸",
+      effects: ["hundred_clones", "death_explosion", "command_focus"],
     },
-    
-    // 15. 连锁爆炸
-    chain_explosion: {
-        id: 'chain_explosion',
-        name: '连锁爆炸',
-        icon: '💣',
-        type: 'passive_trigger',
-        rarity: 'epic',
-        description: '敌人死亡时爆炸，可能引发连锁反应',
-        
-        baseDamage: 20,
-        baseRange: 2,
-        chainCount: 0,
-        
-        levels: [
-            {
-                level: 1,
-                damage: 20,
-                range: 2,
-                chain: 0,
-                description: '敌人死亡时爆炸，范围2格，伤害20',
-                visual: '小型爆炸，橙色火光',
-                effect: 'explosion_small'
-            },
-            {
-                level: 2,
-                damage: 50,
-                range: 3,
-                chain: 1,
-                description: '伤害+30，范围+1格，连锁+1',
-                visual: '爆炸引发附近敌人继续爆炸',
-                effect: 'explosion_chain'
-            },
-            {
-                level: 3,
-                damage: 100,
-                range: 5,
-                chain: 3,
-                description: '伤害+50，范围+2格，连锁+3',
-                visual: '连锁爆炸范围扩大',
-                effect: 'explosion_chain_wide'
-            },
-            {
-                level: 4,
-                damage: 200,
-                range: 8,
-                chain: 5,
-                description: '伤害+100，范围+3格，连锁+5',
-                visual: '爆炸威力明显增强',
-                effect: 'explosion_big'
-            },
-            {
-                level: 5,
-                damage: 300,
-                range: 10,
-                chain: 7,
-                description: '伤害+100，范围+2格，连锁+7',
-                visual: '大范围连锁爆炸',
-                effect: 'explosion_massive'
-            },
-            {
-                level: 6,
-                damage: 400,
-                range: 12,
-                chain: 10,
-                description: '伤害+100，范围+2格，连锁+10',
-                visual: '爆炸链不断延伸',
-                effect: 'explosion_chain_long'
-            },
-            {
-                level: 7,
-                damage: 500,
-                range: 15,
-                chain: 15,
-                description: '伤害+100，范围+3格，连锁+15',
-                visual: '超大范围连锁',
-                effect: 'explosion_ultra'
-            },
-            {
-                level: 8,
-                damage: 500,
-                range: 15,
-                chain: Infinity,
-                description: '满级！连锁无上限，一炸炸全屏',
-                visual: '连锁爆炸覆盖全屏，停不下来',
-                effect: 'explosion_infinite',
-                evolution: {
-                    requiredPassive: 'explosion_radius',
-                    evolvedSkill: 'nuke_chain',
-                    evolvedName: '核爆连锁'
-                }
-            }
-        ],
-        
+  },
+
+  // 15. 连锁爆炸
+  chain_explosion: {
+    id: "chain_explosion",
+    name: "连锁爆炸",
+    icon: "💣",
+    type: "passive_trigger",
+    rarity: "epic",
+    description: "敌人死亡时爆炸，可能引发连锁反应",
+
+    baseDamage: 20,
+    baseRange: 2,
+    chainCount: 0,
+
+    levels: [
+      {
+        level: 1,
+        damage: 20,
+        range: 2,
+        chain: 0,
+        description: "敌人死亡时爆炸，范围2格，伤害20",
+        visual: "小型爆炸，橙色火光",
+        effect: "explosion_small",
+      },
+      {
+        level: 2,
+        damage: 50,
+        range: 3,
+        chain: 1,
+        description: "伤害+30，范围+1格，连锁+1",
+        visual: "爆炸引发附近敌人继续爆炸",
+        effect: "explosion_chain",
+      },
+      {
+        level: 3,
+        damage: 100,
+        range: 5,
+        chain: 3,
+        description: "伤害+50，范围+2格，连锁+3",
+        visual: "连锁爆炸范围扩大",
+        effect: "explosion_chain_wide",
+      },
+      {
+        level: 4,
+        damage: 200,
+        range: 8,
+        chain: 5,
+        description: "伤害+100，范围+3格，连锁+5",
+        visual: "爆炸威力明显增强",
+        effect: "explosion_big",
+      },
+      {
+        level: 5,
+        damage: 300,
+        range: 10,
+        chain: 7,
+        description: "伤害+100，范围+2格，连锁+7",
+        visual: "大范围连锁爆炸",
+        effect: "explosion_massive",
+      },
+      {
+        level: 6,
+        damage: 400,
+        range: 12,
+        chain: 10,
+        description: "伤害+100，范围+2格，连锁+10",
+        visual: "爆炸链不断延伸",
+        effect: "explosion_chain_long",
+      },
+      {
+        level: 7,
+        damage: 500,
+        range: 15,
+        chain: 15,
+        description: "伤害+100，范围+3格，连锁+15",
+        visual: "超大范围连锁",
+        effect: "explosion_ultra",
+      },
+      {
+        level: 8,
+        damage: 500,
+        range: 15,
+        chain: Infinity,
+        description: "满级！连锁无上限，一炸炸全屏",
+        visual: "连锁爆炸覆盖全屏，停不下来",
+        effect: "explosion_infinite",
         evolution: {
-            id: 'nuke_chain',
-            name: '核爆连锁',
-            icon: '💣💣',
-            rarity: 'mythic',
-            damage: 1000,
-            range: 30,
-            description: '每个敌人死亡都核爆，产生辐射区域',
-            visual: '核爆蘑菇云升起，辐射区域持续伤害',
-            effects: ['nuke_explosion', 'radiation_zone', 'infinite_chain']
-        }
-    }
+          requiredPassive: "explosion_radius",
+          evolvedSkill: "nuke_chain",
+          evolvedName: "核爆连锁",
+        },
+      },
+    ],
+
+    evolution: {
+      id: "nuke_chain",
+      name: "核爆连锁",
+      icon: "💣💣",
+      rarity: "mythic",
+      damage: 1000,
+      range: 30,
+      description: "每个敌人死亡都核爆，产生辐射区域",
+      visual: "核爆蘑菇云升起，辐射区域持续伤害",
+      effects: ["nuke_explosion", "radiation_zone", "infinite_chain"],
+    },
+  },
 };
 
 // 导出技能数据
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = SKILLS_DATA;
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = SKILLS_DATA;
 }
 
-console.log('技能数据加载完成 - 15个割草技能');
+console.log("技能数据加载完成 - 15个割草技能");
