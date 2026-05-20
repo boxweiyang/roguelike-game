@@ -3,6 +3,7 @@
 ## ✅ 已完成的优化
 
 ### 1. 对象池系统创建
+
 - ✅ 创建了 `object-pool.js` 文件
 - ✅ 实现了通用 ObjectPool 类
 - ✅ 创建了6个专业对象池：
@@ -14,6 +15,7 @@
   - 旋风效果对象池 (20个对象)
 
 ### 2. 已集成的部分
+
 - ✅ 在 `index.html` 中引入 `object-pool.js`
 - ✅ 在 `startGame()` 中初始化对象池
 - ✅ `spawnEnemies()` 使用对象池创建敌人
@@ -27,19 +29,24 @@
 需要修改 `useSkill()` 函数中的投射物创建：
 
 **位置1** - 霰弹枪散射 (约1033-1049行)
+
 ```javascript
 // 修改前
 gameState.projectiles.push({
-    x: p.x, y: p.y,
-    vx: Math.cos(angle) * skill.speed,
-    vy: Math.sin(angle) * skill.speed,
-    damage: result.damage, pierce, range: skill.range,
-    startX: p.x, startY: p.y,
-    color: '#ff6600',
-    size: 0.3,
-    explosive: false,
-    explosionRadius: 0,
-    isCritical: result.isCritical
+  x: p.x,
+  y: p.y,
+  vx: Math.cos(angle) * skill.speed,
+  vy: Math.sin(angle) * skill.speed,
+  damage: result.damage,
+  pierce,
+  range: skill.range,
+  startX: p.x,
+  startY: p.y,
+  color: "#ff6600",
+  size: 0.3,
+  explosive: false,
+  explosionRadius: 0,
+  isCritical: result.isCritical,
 });
 
 // 修改后
@@ -53,7 +60,7 @@ proj.pierce = pierce;
 proj.range = skill.range;
 proj.startX = p.x;
 proj.startY = p.y;
-proj.color = '#ff6600';
+proj.color = "#ff6600";
 proj.size = 0.3;
 proj.explosive = false;
 proj.explosionRadius = 0;
@@ -65,6 +72,7 @@ gameState.projectiles.push(proj);
 同样修改为使用 `getProjectileFromPool()`
 
 **位置3** - 在 `updateEntities()` 中释放投射物
+
 ```javascript
 // 当投射物消失时
 releaseProjectileToPool(proj);
@@ -73,58 +81,70 @@ releaseProjectileToPool(proj);
 ### 粒子对象池集成
 
 修改 `spawnParticles()` 函数：
+
 ```javascript
-function spawnParticles(x, y, color, count=10) {
-    for (let i = 0; i < count; i++) {
-        const particle = getParticleFromPool();
-        particle.x = x * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE/2;
-        particle.y = y * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE/2;
-        particle.vx = (Math.random()-0.5)*6;
-        particle.vy = (Math.random()-0.5)*6;
-        particle.life = rand(15,30);
-        particle.maxLife = 30;
-        particle.color = color;
-        particle.size = rand(2,5);
-        gameState.particles.push(particle);
-    }
+function spawnParticles(x, y, color, count = 10) {
+  for (let i = 0; i < count; i++) {
+    const particle = getParticleFromPool();
+    particle.x = x * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2;
+    particle.y = y * CONFIG.TILE_SIZE + CONFIG.TILE_SIZE / 2;
+    particle.vx = (Math.random() - 0.5) * 6;
+    particle.vy = (Math.random() - 0.5) * 6;
+    particle.life = rand(15, 30);
+    particle.maxLife = 30;
+    particle.color = color;
+    particle.size = rand(2, 5);
+    gameState.particles.push(particle);
+  }
 }
 ```
 
 修改 `updateEffects()` 释放粒子：
+
 ```javascript
-gameState.particles = gameState.particles.filter(p => {
-    p.x += p.vx; p.y += p.vy; p.life--; p.size *= 0.95; p.vy += 0.15;
-    if (p.life <= 0) {
-        releaseParticleToPool(p);
-        return false;
-    }
-    return true;
+gameState.particles = gameState.particles.filter((p) => {
+  p.x += p.vx;
+  p.y += p.vy;
+  p.life--;
+  p.size *= 0.95;
+  p.vy += 0.15;
+  if (p.life <= 0) {
+    releaseParticleToPool(p);
+    return false;
+  }
+  return true;
 });
 ```
 
 ### 浮动文字对象池
 
 修改 `addFloatingText()` 函数：
+
 ```javascript
 function addFloatingText(x, y, text, color) {
-    const ft = getFloatingTextFromPool();
-    ft.x = x * CONFIG.TILE_SIZE;
-    ft.y = y * CONFIG.TILE_SIZE - 10;
-    ft.text = text;
-    ft.color = color;
-    ft.life = 40;
-    ft.maxLife = 40;
-    ft.vy = -2;
-    gameState.floatingTexts.push(ft);
+  const ft = getFloatingTextFromPool();
+  ft.x = x * CONFIG.TILE_SIZE;
+  ft.y = y * CONFIG.TILE_SIZE - 10;
+  ft.text = text;
+  ft.color = color;
+  ft.life = 40;
+  ft.maxLife = 40;
+  ft.vy = -2;
+  gameState.floatingTexts.push(ft);
 }
 ```
 
 ### 闪电效果对象池
 
 修改 `useSkill()` 中的闪电链部分：
+
 ```javascript
 gameState.lightnings.push({
-    x1: lx, y1: ly, x2: t.x, y2: t.y, life: 12
+  x1: lx,
+  y1: ly,
+  x2: t.x,
+  y2: t.y,
+  life: 12,
 });
 // 改为
 const lightning = getLightningFromPool();
@@ -139,10 +159,15 @@ gameState.lightnings.push(lightning);
 ### 旋风效果对象池
 
 修改 `useSkill()` 中的旋风斩部分：
+
 ```javascript
 const whirlwindData = {
-    x: p.x, y: p.y, radius: skill.range,
-    life: 500, maxLife: 500, angle: 0
+  x: p.x,
+  y: p.y,
+  radius: skill.range,
+  life: 500,
+  maxLife: 500,
+  angle: 0,
 };
 // 改为
 const whirlwind = getWhirlwindFromPool();
@@ -167,11 +192,13 @@ gameState.whirlwinds.push(whirlwind);
 ## 📊 对象池监控
 
 可以通过以下代码查看对象池状态：
+
 ```javascript
 console.log(getAllPoolsStatus());
 ```
 
 输出示例：
+
 ```javascript
 {
   enemy: { poolSize: 150, activeSize: 120, totalSize: 270 },
