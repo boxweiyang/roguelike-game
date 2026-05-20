@@ -88,9 +88,9 @@ const SKILLS = {
     icon: "🔮",
     type: "orbit",
     description: "2个环绕物保护自身",
-    damage: 12,
+    damage: 15, // 从12提升到15（+25%）
     count: 2,
-    radius: 2.5,
+    radius: 2.8, // 从2.5提升到2.8
     cooldown: 0,
   },
   mine: {
@@ -99,10 +99,10 @@ const SKILLS = {
     icon: "💣",
     type: "mine",
     description: "在身后放置地雷",
-    damage: 35,
-    cooldown: 3500,
-    duration: 12000,
-    radius: 2,
+    damage: 50, // 从35提升到50（+43%）
+    cooldown: 3000, // 从3500降低到3000（-14%）
+    duration: 15000, // 从12000提升到15000（+25%）
+    radius: 2.5, // 从2提升到2.5（+25%）
   },
   lightning: {
     id: "lightning",
@@ -3623,7 +3623,7 @@ function gameLoop(timestamp) {
     // 商人系统已改为按钮触发商店
   }
 
-  render(gameState);  // 使用新的渲染系统
+  render(gameState); // 使用新的渲染系统
   requestAnimationFrame(gameLoop);
 }
 
@@ -3742,11 +3742,12 @@ function gameOver() {
     persistentData.maxSurvivalTime = gameState.time;
   }
 
-  // 计算获得的天赋点
+  // 计算获得的天赋点（优化：提高天赋点获取）
   let earnedPoints = 0;
-  earnedPoints += Math.floor(gameState.time / 30);
-  earnedPoints += Math.floor(gameState.kills / 50);
-  earnedPoints += Math.floor(gameState.player.level / 5);
+  earnedPoints += Math.floor(gameState.time / 25); // 每25秒1点（原30秒，提升20%）
+  earnedPoints += Math.floor(gameState.kills / 40); // 每40杀1点（原50杀，提升25%）
+  earnedPoints += Math.floor(gameState.player.level / 4); // 每4级1点（原5级，提升25%）
+  earnedPoints += gameState.player.extracted ? 10 : 0; // 撤离成功额外+10点
 
   persistentData.talentPoints += earnedPoints;
 
