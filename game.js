@@ -2475,7 +2475,7 @@ function searchPointSuccess(sp) {
 function openChest(chest) {
   const p = gameState.player;
   const stats = gameState.playerStats;
-  
+
   // 记录宝箱统计
   if (statisticsSystem) {
     statisticsSystem.recordChestOpened();
@@ -2487,7 +2487,7 @@ function openChest(chest) {
       p.gold += gold;
       persistentData.totalGold += gold;
       addFloatingText(chest.x, chest.y, `+${gold}💰`, "#f1c40f");
-      
+
       // 记录金币统计
       if (statisticsSystem) {
         statisticsSystem.recordGold(gold);
@@ -2506,7 +2506,7 @@ function openChest(chest) {
       p.gold += chest.value;
       persistentData.totalGold += chest.value;
       addFloatingText(chest.x, chest.y, `+${chest.value}💰`, "#f1c40f");
-      
+
       // 记录金币统计
       if (statisticsSystem) {
         statisticsSystem.recordGold(chest.value);
@@ -3786,7 +3786,7 @@ function gameOver() {
 
   // 检查皮肤解锁
   checkSkinUnlocks();
-  
+
   // 记录游戏结束统计
   if (statisticsSystem) {
     statisticsSystem.onGameEnd(gameState.player.extracted);
@@ -3800,7 +3800,7 @@ function gameOver() {
         <p>击杀: ${gameState.kills}</p>
         <p>获得天赋点: +${earnedPoints}</p>
         <p style="color: #f1c40f; margin-top: 10px;">可用天赋点: ${persistentData.talentPoints}</p>
-        ${statisticsSystem ? `<p style="color: #3498db; margin-top: 5px; cursor: pointer;" onclick="statisticsSystem.showStatisticsPanel()">📊 查看详细统计</p>` : ''}
+        ${statisticsSystem ? `<p style="color: #3498db; margin-top: 5px; cursor: pointer;" onclick="statisticsSystem.showStatisticsPanel()">📊 查看详细统计</p>` : ""}
     `;
 }
 
