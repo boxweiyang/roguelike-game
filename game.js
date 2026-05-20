@@ -1511,13 +1511,13 @@ function initPlayer() {
     gold: 0,
     skills: [
       {
-        id: 'death_whirlwind',
-        name: '死亡旋风',
-        icon: '🌪️',
-        type: 'melee_aoe',
+        id: "death_whirlwind",
+        name: "死亡旋风",
+        icon: "🌪️",
+        type: "melee_aoe",
         level: 1,
-        timer: 0
-      }
+        timer: 0,
+      },
     ], // 新系统：初始技能
     inventory: [],
     kills: 0,
@@ -3933,10 +3933,15 @@ function startGame() {
 
   // 初始化技能管理器（新系统）
   if (skillManager) {
-    const gameCanvas = document.getElementById("game-canvas");
+    const gameCanvas = document.getElementById('game-canvas');
     if (gameCanvas) {
       skillManager.init(gameCanvas, ctx);
     }
+  }
+  
+  // 初始化图鉴系统（延迟初始化）
+  if (skillEncyclopedia) {
+    skillEncyclopedia.init();
   }
 
   gameState = {

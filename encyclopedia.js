@@ -7,26 +7,38 @@ class SkillEncyclopedia {
         this.discoveredSkills = {}; // 已发现的技能
         this.discoveredEvolutions = {}; // 已解锁的进化配方
         this.discoveredPassives = {}; // 已发现的被动道具
-        
-        this.init();
+        this.initialized = false;
+        // 不立即初始化，等待persistentData可用
     }
 
+    // 延迟初始化，在persistentData可用后调用
     init() {
+        if (this.initialized) return;
+        
+        // 检查persistentData是否可用
+        if (typeof persistentData === 'undefined') {
+            console.warn('图鉴系统: persistentData 未定义，延迟初始化');
+            return;
+        }
+        
+        this.initialized = true;
+        
         // 从持久化数据加载
-        if (persistentData.encyclopedia) {
-            this.discoveredSkills = persistentData.encyclopedia.skills || {};
-            this.discoveredEvolutions = persistentData.encyclopedia.evolutions || {};
-            this.discoveredPassives = persistentData.encyclopedia.passives || {};
-        } else {
+        if (!persistentData.encyclopedia) {
             persistentData.encyclopedia = {
                 skills: {},
                 evolutions: {},
                 passives: {}
             };
         }
+        
+        this.discoveredSkills = persistentData.encyclopedia.skills || {};
+        this.discoveredEvolutions = persistentData.encyclopedia.evolutions || {};
+        this.discoveredPassives = persistentData.encyclopedia.passives || {};
 
         // 创建图鉴UI
         this.createEncyclopediaUI();
+        console.log('技能图鉴系统初始化完成');
     }
 
     // 创建图鉴界面
@@ -459,8 +471,8 @@ class SkillEncyclopedia {
     }
 }
 
-// 创建全局实例
+// 创建全局实例（不立即初始化）
 const skillEncyclopedia = new SkillEncyclopedia();
 window.skillEncyclopedia = skillEncyclopedia;
 
-console.log('技能图鉴系统初始化完成');
+console.log('技能图鉴系统加载完成（等待persistentData初始化）');
