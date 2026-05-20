@@ -31,7 +31,9 @@ class SkillManager {
 
         // 同时也添加到gameState.player.skills
         if (gameState && gameState.player) {
-          const existingSkill = gameState.player.skills.find(s => s.id === skillId);
+          const existingSkill = gameState.player.skills.find(
+            (s) => s.id === skillId,
+          );
           if (!existingSkill) {
             gameState.player.skills.push({
               id: skillId,
@@ -41,7 +43,7 @@ class SkillManager {
               level: 1,
               timer: 0,
               data: SKILLS_DATA[skillId],
-              lastUseTime: 0
+              lastUseTime: 0,
             });
           }
         }
@@ -137,8 +139,14 @@ class SkillManager {
 
   // 更新所有技能（每帧调用）
   update(player, enemies) {
-    if (!this.skillEffects) return;
-    if (!player || !player.skills) return;
+    if (!this.skillEffects) {
+      console.warn("skillManager: skillEffects未初始化");
+      return;
+    }
+    if (!player || !player.skills) {
+      console.warn("skillManager: player或player.skills不存在");
+      return;
+    }
 
     this.skillEffects.update();
 
@@ -150,15 +158,37 @@ class SkillManager {
       if (!skill.data) {
         skill.data = SKILLS_DATA[skill.id];
       }
-      
-      const skillData = skill.data;
-      if (!skillData) return;
-      
-      const cooldown = this.getSkillCooldown(skillData);
 
-      if (now - skill.lastUseTime >= cooldown) {
-        this.useSkill(skill, player, enemies);
+      const skillData = skill.data;
+      if (!skillData) {
+        console.warn("skillManager: 技能", skill.id, "缺少data");
+        return;
+      }
+
+      const cooldown = this.getSkillCooldown(skillData);
+      const timeSinceLastUse = now - (skill.lastUseTime || 0);
+
+      // 调试日志（只在首次或就绪时打印）
+      if (!skill._logged) {
+        console.log(
+          "skillManager: 技能",
+          skill.id,
+          "| 冷却:",
+          cooldown,
+          "| 上次使用:",
+          skill.lastUseTime,
+          "| 经过时间:",
+          timeSinceLastUse,
+          "| 就绪:",
+          timeSinceLastUse >= cooldown,
+        );
+        skill._logged = true;
+      }
+
+      if (timeSinceLastUse >= cooldown) {
+        console.log("skillManager: 执行技能", skill.id, "等级", skill.level);
         skill.lastUseTime = now;
+        this.useSkill(skill, player, enemies);
       }
     });
 
@@ -197,13 +227,39 @@ class SkillManager {
     const level = skill.level;
     const levelData = skillData.levels ? skillData.levels[level - 1] : null;
 
-    if (!levelData) return;
+    console.log(
+      "useSkill: 技能=",
+      skill.id,
+      "等级=",
+      level,
+      "类型=",
+      skillData.type,
+    );
+    console.log("useSkill: levelData=", levelData);
+
+    if (!levelData) {
+      console.warn(
+        "useSkill: 没有levelData，技能id=",
+        skill.id,
+        "等级=",
+        level,
+      );
+      return;
+    }
 
     const baseDamage = levelData.damage || skillData.baseDamage || 0;
     const finalDamage = this.calculateDamage(baseDamage, skillData.type);
 
+    console.log(
+      "useSkill: baseDamage=",
+      baseDamage,
+      "finalDamage=",
+      finalDamage,
+    );
+
     switch (skillData.type) {
       case "melee_aoe":
+        console.log("useSkill: 执行melee_aoe");
         this.executeMeleeAOE(player, enemies, levelData, finalDamage);
         break;
       case "auto_aoe":

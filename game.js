@@ -1518,7 +1518,7 @@ function initPlayer() {
         level: 1,
         timer: 0,
         data: SKILLS_DATA.death_whirlwind,
-        lastUseTime: 0
+        lastUseTime: 0,
       },
     ], // 新系统：初始技能
     inventory: [],
@@ -3935,9 +3935,12 @@ function startGame() {
 
   // 初始化技能管理器（新系统）
   if (skillManager) {
-    const gameCanvas = document.getElementById("game-canvas");
-    if (gameCanvas) {
+    const gameCanvas = document.getElementById('gameCanvas'); // 注意：id是gameCanvas不是game-canvas
+    if (gameCanvas && ctx) {
       skillManager.init(gameCanvas, ctx);
+      console.log('技能管理器初始化成功');
+    } else {
+      console.warn('技能管理器初始化失败: canvas=', gameCanvas, 'ctx=', ctx);
     }
   }
 
