@@ -1517,6 +1517,8 @@ function initPlayer() {
         type: "melee_aoe",
         level: 1,
         timer: 0,
+        data: SKILLS_DATA.death_whirlwind,
+        lastUseTime: 0
       },
     ], // 新系统：初始技能
     inventory: [],
@@ -3933,17 +3935,17 @@ function startGame() {
 
   // 初始化技能管理器（新系统）
   if (skillManager) {
-    const gameCanvas = document.getElementById('game-canvas');
+    const gameCanvas = document.getElementById("game-canvas");
     if (gameCanvas) {
       skillManager.init(gameCanvas, ctx);
     }
   }
-  
+
   // 初始化图鉴系统（延迟初始化）
   if (skillEncyclopedia) {
     skillEncyclopedia.init();
   }
-    
+
   // 初始化统计系统（延迟初始化）
   if (statisticsSystem) {
     statisticsSystem.init();

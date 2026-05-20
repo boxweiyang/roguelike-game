@@ -29,6 +29,23 @@ class SkillManager {
           lastUseTime: 0,
         };
 
+        // 同时也添加到gameState.player.skills
+        if (gameState && gameState.player) {
+          const existingSkill = gameState.player.skills.find(s => s.id === skillId);
+          if (!existingSkill) {
+            gameState.player.skills.push({
+              id: skillId,
+              name: SKILLS_DATA[skillId].name,
+              icon: SKILLS_DATA[skillId].icon,
+              type: SKILLS_DATA[skillId].type,
+              level: 1,
+              timer: 0,
+              data: SKILLS_DATA[skillId],
+              lastUseTime: 0
+            });
+          }
+        }
+
         // 记录到图鉴
         if (skillEncyclopedia) {
           skillEncyclopedia.discoverSkill(skillId);
@@ -121,14 +138,22 @@ class SkillManager {
   // 更新所有技能（每帧调用）
   update(player, enemies) {
     if (!this.skillEffects) return;
+    if (!player || !player.skills) return;
 
     this.skillEffects.update();
 
     const now = Date.now();
 
-    // 更新技能冷却和使用
-    Object.values(this.playerSkills).forEach((skill) => {
+    // 更新技能冷却和使用 - 遍历gameState.player.skills
+    player.skills.forEach((skill) => {
+      // 确保技能有data属性
+      if (!skill.data) {
+        skill.data = SKILLS_DATA[skill.id];
+      }
+      
       const skillData = skill.data;
+      if (!skillData) return;
+      
       const cooldown = this.getSkillCooldown(skillData);
 
       if (now - skill.lastUseTime >= cooldown) {
