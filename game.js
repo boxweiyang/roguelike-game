@@ -3623,7 +3623,7 @@ function gameLoop(timestamp) {
     // 商人系统已改为按钮触发商店
   }
 
-  render();
+  render(gameState);  // 使用新的渲染系统
   requestAnimationFrame(gameLoop);
 }
 
