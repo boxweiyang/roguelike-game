@@ -20,11 +20,20 @@ function initRender() {
 
 // 主渲染函数
 function render(gameState) {
-  if (!gameCtx) return;
+  console.log('renderer.render() 被调用');
+  if (!gameCtx) {
+    console.warn('renderer: gameCtx未初始化!');
+    return;
+  }
 
   const ctx = gameCtx;
   const p = gameState.player;
-  if (!p) return;
+  if (!p) {
+    console.warn('renderer: player不存在!');
+    return;
+  }
+
+  console.log('renderer: 开始渲染, player.x=', p.x, 'player.y=', p.y);
 
   // 清屏
   ctx.fillStyle = "#0d0d0d";
@@ -53,15 +62,15 @@ function render(gameState) {
   renderFloatingTexts(ctx, gameState.floatingTexts);
 
   // 渲染技能特效（在摄像机坐标系内）
-  console.log('renderer: 检查skillManager');
+  console.log("renderer: 检查skillManager");
   if (skillManager && skillManager.skillEffects) {
     console.log("renderer: 准备渲染技能特效");
     console.log("  - camX=", camX, "camY=", camY);
     console.log("  - player.x=", p.x, "player.y=", p.y);
     console.log("  - effects数量=", skillManager.skillEffects.effects.length);
-    console.log('renderer: 调用skillManager.skillEffects.render()');
+    console.log("renderer: 调用skillManager.skillEffects.render()");
     skillManager.skillEffects.render(ctx);
-    console.log('renderer: skillManager.skillEffects.render() 调用完成');
+    console.log("renderer: skillManager.skillEffects.render() 调用完成");
   } else {
     console.warn("renderer: skillManager或skillEffects不存在");
     console.log("  - skillManager=", skillManager);
