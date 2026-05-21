@@ -53,16 +53,22 @@ function render(gameState) {
   renderFloatingTexts(ctx, gameState.floatingTexts);
 
   // 渲染技能特效（在摄像机坐标系内）
+  console.log('renderer: 检查skillManager');
   if (skillManager && skillManager.skillEffects) {
-    console.log('renderer: 准备渲染技能特效');
-    console.log('  - camX=', camX, 'camY=', camY);
-    console.log('  - player.x=', p.x, 'player.y=', p.y);
-    console.log('  - effects数量=', skillManager.skillEffects.effects.length);
+    console.log("renderer: 准备渲染技能特效");
+    console.log("  - camX=", camX, "camY=", camY);
+    console.log("  - player.x=", p.x, "player.y=", p.y);
+    console.log("  - effects数量=", skillManager.skillEffects.effects.length);
+    console.log('renderer: 调用skillManager.skillEffects.render()');
     skillManager.skillEffects.render(ctx);
+    console.log('renderer: skillManager.skillEffects.render() 调用完成');
   } else {
-    console.warn('renderer: skillManager或skillEffects不存在');
-    console.log('  - skillManager=', skillManager);
-    console.log('  - skillEffects=', skillManager ? skillManager.skillEffects : null);
+    console.warn("renderer: skillManager或skillEffects不存在");
+    console.log("  - skillManager=", skillManager);
+    console.log(
+      "  - skillEffects=",
+      skillManager ? skillManager.skillEffects : null,
+    );
   }
 
   ctx.restore();

@@ -312,6 +312,8 @@ class SkillEffectRenderer {
       const progress = (Date.now() - e.startTime) / e.duration;
       ctx.globalAlpha = 1;
 
+      console.log('渲染effect: type=', e.type, 'e=', e);
+
       switch (e.type) {
         case "lightning":
           this.renderLightning(ctx, e);
@@ -326,6 +328,7 @@ class SkillEffectRenderer {
           this.renderBlackHole(ctx, e);
           break;
         case "whirlwind":
+          console.log('匹配到whirlwind!');
           this.renderWhirlwind(ctx, e);
           break;
         case "shield":
@@ -334,6 +337,8 @@ class SkillEffectRenderer {
         case "floating_text":
           this.renderFloatingText(ctx, e);
           break;
+        default:
+          console.warn('未匹配的effect type:', e.type);
       }
     });
 
@@ -438,12 +443,19 @@ class SkillEffectRenderer {
 
   // 渲染旋风
   renderWhirlwind(ctx, e) {
-    console.log('renderWhirlwind被调用: x=', e.x, 'y=', e.y, 'radius=', e.radius);
-    console.log('  globalAlpha=', ctx.globalAlpha);
-    
+    console.log(
+      "renderWhirlwind被调用: x=",
+      e.x,
+      "y=",
+      e.y,
+      "radius=",
+      e.radius,
+    );
+    console.log("  globalAlpha=", ctx.globalAlpha);
+
     const elapsed = Date.now() - e.startTime;
     const progress = elapsed / e.duration;
-    
+
     // 确保透明度为1
     ctx.globalAlpha = 1;
 
