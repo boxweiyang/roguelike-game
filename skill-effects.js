@@ -149,7 +149,7 @@ class SkillEffectRenderer {
   }
 
   // 创建旋风效果
-  createWhirlwind(x, y, radius, bladeCount, duration = 2000) {
+  createWhirlwind(x, y, radius, bladeCount, duration = 2000, player = null) {
     this.effects.push({
       x: x,
       y: y,
@@ -157,8 +157,9 @@ class SkillEffectRenderer {
       bladeCount: bladeCount,
       startTime: Date.now(),
       duration: duration,
-      type: "whirlwind",
+      type: 'whirlwind',
       rotation: 0,
+      player: player  // 保存player引用以便跟随
     });
   }
 
@@ -210,15 +211,17 @@ class SkillEffectRenderer {
   // 更新所有效果
   update() {
     const now = Date.now();
-    
+
     // 调试日志：检查whirlwind特效
-    const whirlwinds = this.effects.filter(e => e.type === 'whirlwind');
+    const whirlwinds = this.effects.filter((e) => e.type === "whirlwind");
     if (whirlwinds.length > 0) {
-      console.log('skillEffects.update: whirlwind数量=', whirlwinds.length);
+      console.log("skillEffects.update: whirlwind数量=", whirlwinds.length);
       whirlwinds.forEach((w, i) => {
         const elapsed = now - w.startTime;
         const remaining = w.duration - elapsed;
-        console.log(`  whirlwind[${i}]: x=${w.x}, y=${w.y}, 剩余时间=${remaining}ms`);
+        console.log(
+          `  whirlwind[${i}]: x=${w.x}, y=${w.y}, 剩余时间=${remaining}ms`,
+        );
       });
     }
 
@@ -244,6 +247,11 @@ class SkillEffectRenderer {
 
       if (e.type === "whirlwind") {
         e.rotation += 0.1;
+        // 跟随玩家位置
+        if (e.player) {
+          e.x = e.player.x * CONFIG.TILE_SIZE;
+          e.y = e.player.y * CONFIG.TILE_SIZE;
+        }
       } else if (e.type === "black_hole") {
         e.rotation += 0.05;
         // 更新吸入粒子
@@ -266,12 +274,14 @@ class SkillEffectRenderer {
   // 渲染所有效果
   render() {
     const ctx = this.ctx;
-    
+
     // 调试：检查effects数组
     if (this.effects.length > 0) {
-      console.log('skillEffects.render: effects数量=', this.effects.length);
+      console.log("skillEffects.render: effects数量=", this.effects.length);
       this.effects.forEach((e, i) => {
-        console.log(`  effect[${i}]: type=${e.type}, x=${e.x}, y=${e.y}, radius=${e.radius}`);
+        console.log(
+          `  effect[${i}]: type=${e.type}, x=${e.x}, y=${e.y}, radius=${e.radius}`,
+        );
       });
     }
 
