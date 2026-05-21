@@ -317,25 +317,25 @@ class SkillManager {
   executeMeleeAOE(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE; // 转换为像素
     const bladeCount = levelData.blades || 4;
-  
+
     // 玩家位置转换为像素坐标
     const pixelX = player.x * CONFIG.TILE_SIZE;
     const pixelY = player.y * CONFIG.TILE_SIZE;
-  
+
     // 创建旋风特效 - 添加player引用以便跟随
     if (this.skillEffects) {
       // 清除旧的whirlwind特效，避免叠加
       this.skillEffects.effects = this.skillEffects.effects.filter(
-        e => e.type !== 'whirlwind'
+        (e) => e.type !== "whirlwind",
       );
-        
+
       this.skillEffects.createWhirlwind(
         pixelX,
         pixelY,
         range,
         bladeCount,
         2000,
-        player  // 传入player引用
+        player, // 传入player引用
       );
     }
 
@@ -355,7 +355,7 @@ class SkillManager {
   executeAutoAOE(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
     const lightningCount = levelData.lightnings || 1;
-
+  
     // 选择最近的敌人
     const targets = this.findNearestEnemies(
       player,
@@ -363,7 +363,7 @@ class SkillManager {
       lightningCount,
       range,
     );
-
+  
     targets.forEach((target) => {
       // 创建闪电特效（转换为像素坐标）
       if (this.skillEffects) {
@@ -376,23 +376,23 @@ class SkillManager {
           3,
         );
       }
-
+  
       this.dealDamage(target, damage);
     });
   }
-
+  
   // 执行AOE投射物（如地狱火雨）
   executeAOEProjectile(player, enemies, levelData, damage) {
     const count = levelData.projectiles || 3;
     const range = levelData.range * CONFIG.TILE_SIZE;
-
+  
     for (let i = 0; i < count; i++) {
       // 随机选择目标位置（像素坐标）
       const playerPixelX = player.x * CONFIG.TILE_SIZE;
       const playerPixelY = player.y * CONFIG.TILE_SIZE;
       const targetX = playerPixelX + (Math.random() - 0.5) * range * 2;
       const targetY = playerPixelY + (Math.random() - 0.5) * range * 2;
-
+  
       // 添加投射物
       this.projectiles.push({
         x: playerPixelX,
@@ -406,15 +406,15 @@ class SkillManager {
       });
     }
   }
-
+  
   // 执行环绕物（如剑刃风暴）
   executeOrbit(player, enemies, levelData, damage) {
     const bladeCount = levelData.blades || 4;
     const range = levelData.range * CONFIG.TILE_SIZE;
-
+  
     // 清空旧环绕物
     this.orbitals = [];
-
+  
     // 创建新环绕物
     for (let i = 0; i < bladeCount; i++) {
       this.orbitals.push({
@@ -426,14 +426,14 @@ class SkillManager {
       });
     }
   }
-
+  
   // 执行追踪投射物（如爆裂飞弹）
   executeHomingProjectile(player, enemies, levelData, damage) {
     const count = levelData.missiles || 1;
     const range = levelData.range * CONFIG.TILE_SIZE;
-
+  
     const targets = this.findNearestEnemies(player, enemies, count, range);
-
+  
     targets.forEach((target) => {
       this.projectiles.push({
         x: player.x * CONFIG.TILE_SIZE,
@@ -447,28 +447,32 @@ class SkillManager {
       });
     });
   }
-
+  
   // 执行控制AOE（如黑洞）
   executeControlAOE(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
     const duration = levelData.duration || 5000;
-
-    // 创建黑洞特效
+  
+    // 清除旧黑洞特效
     if (this.skillEffects) {
+      this.skillEffects.effects = this.skillEffects.effects.filter(
+        e => e.type !== 'black_hole'
+      );
+        
       this.skillEffects.createBlackHole(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range,
-        duration,
+        duration
       );
     }
-
+  
     // 对范围内敌人造成伤害并拉向中心
     enemies.forEach((enemy) => {
       const dist = Math.sqrt(
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
-
+  
       if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
         // 拉向黑洞中心
@@ -477,14 +481,14 @@ class SkillManager {
       }
     });
   }
-
+  
   // 执行远程单体（如狙击）
   executeRangedSingle(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
-
+  
     const target = this.findNearestEnemy(player, enemies, range);
     if (!target) return;
-
+  
     this.projectiles.push({
       x: player.x * CONFIG.TILE_SIZE,
       y: player.y * CONFIG.TILE_SIZE,
@@ -497,26 +501,30 @@ class SkillManager {
       critChance: levelData.critChance || 0,
     });
   }
-
+  
   // 执行AOE控制（如冰霜新星）
   executeAOEControl(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
-
-    // 创建冰霜特效
+  
+    // 清除旧冰霜特效
     if (this.skillEffects) {
+      this.skillEffects.effects = this.skillEffects.effects.filter(
+        e => e.type !== 'frost'
+      );
+        
       this.skillEffects.createFrostEffect(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
-        range,
+        range
       );
     }
-
+  
     // 对范围内敌人造成伤害并减速
     enemies.forEach((enemy) => {
       const dist = Math.sqrt(
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
-
+  
       if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
         enemy.slowed = true;
