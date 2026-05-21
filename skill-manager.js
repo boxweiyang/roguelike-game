@@ -283,6 +283,27 @@ class SkillManager {
       case "aoe_control":
         this.executeAOEControl(player, enemies, levelData, finalDamage);
         break;
+      case "dot_aoe":
+        this.executeDotAOE(player, enemies, levelData, finalDamage);
+        break;
+      case "defense":
+        this.executeDefense(player, enemies, levelData, finalDamage);
+        break;
+      case "sustain":
+        this.executeSustain(player, enemies, levelData, finalDamage);
+        break;
+      case "random_aoe":
+        this.executeRandomAOE(player, enemies, levelData, finalDamage);
+        break;
+      case "random_buff":
+        this.executeRandomBuff(player, enemies, levelData, finalDamage);
+        break;
+      case "summon":
+        this.executeSummon(player, enemies, levelData, finalDamage);
+        break;
+      case "passive_trigger":
+        this.executePassiveTrigger(player, enemies, levelData, finalDamage);
+        break;
     }
   }
 
@@ -355,7 +376,7 @@ class SkillManager {
   executeAutoAOE(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
     const lightningCount = levelData.lightnings || 1;
-  
+
     // 选择最近的敌人
     const targets = this.findNearestEnemies(
       player,
@@ -363,7 +384,7 @@ class SkillManager {
       lightningCount,
       range,
     );
-  
+
     targets.forEach((target) => {
       // 创建闪电特效（转换为像素坐标）
       if (this.skillEffects) {
@@ -376,23 +397,23 @@ class SkillManager {
           3,
         );
       }
-  
+
       this.dealDamage(target, damage);
     });
   }
-  
+
   // 执行AOE投射物（如地狱火雨）
   executeAOEProjectile(player, enemies, levelData, damage) {
     const count = levelData.projectiles || 3;
     const range = levelData.range * CONFIG.TILE_SIZE;
-  
+
     for (let i = 0; i < count; i++) {
       // 随机选择目标位置（像素坐标）
       const playerPixelX = player.x * CONFIG.TILE_SIZE;
       const playerPixelY = player.y * CONFIG.TILE_SIZE;
       const targetX = playerPixelX + (Math.random() - 0.5) * range * 2;
       const targetY = playerPixelY + (Math.random() - 0.5) * range * 2;
-  
+
       // 添加投射物
       this.projectiles.push({
         x: playerPixelX,
@@ -406,15 +427,15 @@ class SkillManager {
       });
     }
   }
-  
+
   // 执行环绕物（如剑刃风暴）
   executeOrbit(player, enemies, levelData, damage) {
     const bladeCount = levelData.blades || 4;
     const range = levelData.range * CONFIG.TILE_SIZE;
-  
+
     // 清空旧环绕物
     this.orbitals = [];
-  
+
     // 创建新环绕物
     for (let i = 0; i < bladeCount; i++) {
       this.orbitals.push({
@@ -426,14 +447,14 @@ class SkillManager {
       });
     }
   }
-  
+
   // 执行追踪投射物（如爆裂飞弹）
   executeHomingProjectile(player, enemies, levelData, damage) {
     const count = levelData.missiles || 1;
     const range = levelData.range * CONFIG.TILE_SIZE;
-  
+
     const targets = this.findNearestEnemies(player, enemies, count, range);
-  
+
     targets.forEach((target) => {
       this.projectiles.push({
         x: player.x * CONFIG.TILE_SIZE,
@@ -447,32 +468,32 @@ class SkillManager {
       });
     });
   }
-  
+
   // 执行控制AOE（如黑洞）
   executeControlAOE(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
     const duration = levelData.duration || 5000;
-  
+
     // 清除旧黑洞特效
     if (this.skillEffects) {
       this.skillEffects.effects = this.skillEffects.effects.filter(
-        e => e.type !== 'black_hole'
+        (e) => e.type !== "black_hole",
       );
-        
+
       this.skillEffects.createBlackHole(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range,
-        duration
+        duration,
       );
     }
-  
+
     // 对范围内敌人造成伤害并拉向中心
     enemies.forEach((enemy) => {
       const dist = Math.sqrt(
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
-  
+
       if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
         // 拉向黑洞中心
@@ -481,14 +502,14 @@ class SkillManager {
       }
     });
   }
-  
+
   // 执行远程单体（如狙击）
   executeRangedSingle(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
-  
+
     const target = this.findNearestEnemy(player, enemies, range);
     if (!target) return;
-  
+
     this.projectiles.push({
       x: player.x * CONFIG.TILE_SIZE,
       y: player.y * CONFIG.TILE_SIZE,
@@ -501,25 +522,60 @@ class SkillManager {
       critChance: levelData.critChance || 0,
     });
   }
-  
+
   // 执行AOE控制（如冰霜新星）
   executeAOEControl(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
-  
+    
     // 清除旧冰霜特效
     if (this.skillEffects) {
       this.skillEffects.effects = this.skillEffects.effects.filter(
         e => e.type !== 'frost'
       );
-        
+          
       this.skillEffects.createFrostEffect(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range
       );
     }
-  
+    
     // 对范围内敌人造成伤害并减速
+    enemies.forEach((enemy) => {
+      const dist = Math.sqrt(
+        Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
+      );
+    
+      if (dist <= levelData.range) {
+        this.dealDamage(enemy, damage);
+        enemy.slowed = true;
+        enemy.slowDuration = levelData.freezeDuration || 2000;
+      }
+    });
+  }
+  
+  // 执行持续AOE（如死亡之握）
+  executeDotAOE(player, enemies, levelData, damage) {
+    const range = levelData.range * CONFIG.TILE_SIZE;
+    const duration = levelData.duration || 3000;
+  
+    // 清除旧特效
+    if (this.skillEffects) {
+      this.skillEffects.effects = this.skillEffects.effects.filter(
+        e => e.type !== 'fire'
+      );
+  
+      // 创建黑暗能量场
+      this.skillEffects.createFireEffect(
+        player.x * CONFIG.TILE_SIZE,
+        player.y * CONFIG.TILE_SIZE,
+        range,
+        duration,
+        '#8b00ff'
+      );
+    }
+  
+    // 对范围内敌人造成持续伤害
     enemies.forEach((enemy) => {
       const dist = Math.sqrt(
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
@@ -527,10 +583,158 @@ class SkillManager {
   
       if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
-        enemy.slowed = true;
-        enemy.slowDuration = levelData.freezeDuration || 2000;
+        // 吸血效果
+        if (player.hp < player.maxHp) {
+          player.hp = Math.min(player.maxHp, player.hp + damage * 0.3);
+        }
       }
     });
+  }
+  
+  // 执行防御技能（如神圣护盾）
+  executeDefense(player, enemies, levelData, damage) {
+    const range = levelData.shieldRange * CONFIG.TILE_SIZE || 100;
+    const duration = levelData.duration || 5000;
+  
+    // 创建护盾特效
+    if (this.skillEffects) {
+      this.skillEffects.createShield(
+        player.x * CONFIG.TILE_SIZE,
+        player.y * CONFIG.TILE_SIZE,
+        range,
+        '#ffd700'
+      );
+    }
+  
+    // 添加护盾状态
+    player.shield = (player.shield || 0) + levelData.shieldAmount || 50;
+    player.shieldDuration = duration;
+  }
+  
+  // 执行持续恢复（如生命汲取）
+  executeSustain(player, enemies, levelData, damage) {
+    const healAmount = levelData.healAmount || 10;
+      
+    // 恢复生命
+    if (player.hp < player.maxHp) {
+      player.hp = Math.min(player.maxHp, player.hp + healAmount);
+    }
+  
+    // 对范围内敌人造成伤害并吸血
+    const range = levelData.range * CONFIG.TILE_SIZE;
+    enemies.forEach((enemy) => {
+      const dist = Math.sqrt(
+        Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
+      );
+  
+      if (dist <= levelData.range) {
+        this.dealDamage(enemy, damage);
+        // 额外吸血
+        if (player.hp < player.maxHp) {
+          player.hp = Math.min(player.maxHp, player.hp + damage * 0.2);
+        }
+      }
+    });
+  }
+  
+  // 执行随机AOE（如星辰坠落）
+  executeRandomAOE(player, enemies, levelData, damage) {
+    const count = levelData.stars || 5;
+    const range = levelData.range * CONFIG.TILE_SIZE;
+  
+    for (let i = 0; i < count; i++) {
+      // 随机选择目标位置
+      const targetX = player.x * CONFIG.TILE_SIZE + (Math.random() - 0.5) * range * 2;
+      const targetY = player.y * CONFIG.TILE_SIZE + (Math.random() - 0.5) * range * 2;
+  
+      // 添加投射物（星辰）
+      this.projectiles.push({
+        x: targetX,
+        y: player.y * CONFIG.TILE_SIZE - 200,
+        targetX: targetX,
+        targetY: targetY,
+        damage: damage,
+        type: 'star',
+        speed: 6,
+        range: 80,
+      });
+    }
+  }
+  
+  // 执行随机增益（如幸运轮盘）
+  executeRandomBuff(player, enemies, levelData, damage) {
+    // 随机选择一个增益效果
+    const buffs = ['damage_boost', 'speed_boost', 'defense_boost', 'cooldown_reduction'];
+    const randomBuff = buffs[Math.floor(Math.random() * buffs.length)];
+  
+    // 应用增益
+    if (!player.buffs) player.buffs = {};
+    player.buffs[randomBuff] = {
+      duration: levelData.duration || 5000,
+      value: levelData.buffValue || 0.2
+    };
+  
+    // 创建特效
+    if (this.skillEffects) {
+      this.skillEffects.createExplosion(
+        player.x * CONFIG.TILE_SIZE,
+        player.y * CONFIG.TILE_SIZE,
+        '#ffff00',
+        15,
+        4,
+        2
+      );
+    }
+  }
+  
+  // 执行召唤（如镜像分身）
+  executeSummon(player, enemies, levelData, damage) {
+    const count = levelData.clones || 1;
+    const duration = levelData.duration || 10000;
+  
+    // 创建分身特效
+    if (this.skillEffects) {
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count;
+        const dist = 100;
+        const cloneX = player.x * CONFIG.TILE_SIZE + Math.cos(angle) * dist;
+        const cloneY = player.y * CONFIG.TILE_SIZE + Math.sin(angle) * dist;
+  
+        this.skillEffects.createExplosion(
+          cloneX,
+          cloneY,
+          '#00ffff',
+          10,
+          3,
+          2
+        );
+      }
+    }
+  
+    // 注意：实际的分身逻辑需要在game.js中实现
+    // 这里只负责特效
+  }
+  
+  // 执行被动触发（如连锁爆炸）
+  executePassiveTrigger(player, enemies, levelData, damage) {
+    // 这个技能由敌人死亡时触发
+    // 在dealDamage函数中处理
+    // 这里创建爆炸特效
+    if (this.skillEffects && enemies.length > 0) {
+      // 对最近的敌人造成爆炸伤害
+      const target = this.findNearestEnemy(player, enemies, levelData.range * CONFIG.TILE_SIZE);
+      if (target) {
+        this.skillEffects.createExplosion(
+          target.x * CONFIG.TILE_SIZE,
+          target.y * CONFIG.TILE_SIZE,
+          '#ff6600',
+          20,
+          6,
+          3
+        );
+        this.dealDamage(target, damage);
+      }
+    }
   }
 
   // 更新投射物
