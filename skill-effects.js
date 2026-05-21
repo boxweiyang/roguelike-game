@@ -157,9 +157,9 @@ class SkillEffectRenderer {
       bladeCount: bladeCount,
       startTime: Date.now(),
       duration: duration,
-      type: 'whirlwind',
+      type: "whirlwind",
       rotation: 0,
-      player: player  // 保存player引用以便跟随
+      player: player, // 保存player引用以便跟随
     });
   }
 
@@ -438,8 +438,14 @@ class SkillEffectRenderer {
 
   // 渲染旋风
   renderWhirlwind(ctx, e) {
+    console.log('renderWhirlwind被调用: x=', e.x, 'y=', e.y, 'radius=', e.radius);
+    console.log('  globalAlpha=', ctx.globalAlpha);
+    
     const elapsed = Date.now() - e.startTime;
     const progress = elapsed / e.duration;
+    
+    // 确保透明度为1
+    ctx.globalAlpha = 1;
 
     // 刀刃应该在半径内旋转，而不是在半径边缘
     const orbitRadius = e.radius * 0.6; // 使用60%的半径作为旋转轨道
