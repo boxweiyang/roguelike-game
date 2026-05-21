@@ -317,20 +317,25 @@ class SkillManager {
   executeMeleeAOE(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE; // 转换为像素
     const bladeCount = levelData.blades || 4;
-
+  
     // 玩家位置转换为像素坐标
     const pixelX = player.x * CONFIG.TILE_SIZE;
     const pixelY = player.y * CONFIG.TILE_SIZE;
-
+  
     // 创建旋风特效 - 添加player引用以便跟随
     if (this.skillEffects) {
+      // 清除旧的whirlwind特效，避免叠加
+      this.skillEffects.effects = this.skillEffects.effects.filter(
+        e => e.type !== 'whirlwind'
+      );
+        
       this.skillEffects.createWhirlwind(
         pixelX,
         pixelY,
         range,
         bladeCount,
         2000,
-        player, // 传入player引用
+        player  // 传入player引用
       );
     }
 
