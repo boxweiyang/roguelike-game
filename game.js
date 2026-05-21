@@ -2847,9 +2847,10 @@ function updateEntities(dt) {
 }
 
 // ============================================
-// 渲染
+// 渲染 - 已移至renderer.js，此旧函数已禁用
 // ============================================
 
+/*  // 旧render函数已禁用，使用renderer.js中的render(gameState)
 function render() {
   const ts = CONFIG.TILE_SIZE;
   const p = gameState.player;
@@ -3301,6 +3302,7 @@ function render() {
 
   renderMinimap();
 }
+*/ // 旧render函数结束
 
 // renderMinimap 已移至 renderer.js 中
 
