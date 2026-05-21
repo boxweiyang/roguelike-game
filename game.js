@@ -3929,7 +3929,7 @@ function startGame() {
 
   // 初始化渲染系统（重要！）
   initRender();
-  console.log('渲染系统已初始化');
+  console.log("渲染系统已初始化");
 
   // 初始化对象池（性能优化）
   initAllPools();

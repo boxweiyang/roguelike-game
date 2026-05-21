@@ -20,20 +20,20 @@ function initRender() {
 
 // 主渲染函数
 function render(gameState) {
-  console.log('renderer.render() 被调用');
+  console.log("renderer.render() 被调用");
   if (!gameCtx) {
-    console.warn('renderer: gameCtx未初始化!');
+    console.warn("renderer: gameCtx未初始化!");
     return;
   }
 
   const ctx = gameCtx;
   const p = gameState.player;
   if (!p) {
-    console.warn('renderer: player不存在!');
+    console.warn("renderer: player不存在!");
     return;
   }
 
-  console.log('renderer: 开始渲染, player.x=', p.x, 'player.y=', p.y);
+  console.log("renderer: 开始渲染, player.x=", p.x, "player.y=", p.y);
 
   // 清屏
   ctx.fillStyle = "#0d0d0d";

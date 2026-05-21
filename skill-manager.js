@@ -330,7 +330,7 @@ class SkillManager {
         range,
         bladeCount,
         2000,
-        player  // 传入player引用
+        player, // 传入player引用
       );
     }
 

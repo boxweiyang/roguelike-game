@@ -312,7 +312,7 @@ class SkillEffectRenderer {
       const progress = (Date.now() - e.startTime) / e.duration;
       ctx.globalAlpha = 1;
 
-      console.log('渲染effect: type=', e.type, 'e=', e);
+      console.log("渲染effect: type=", e.type, "e=", e);
 
       switch (e.type) {
         case "lightning":
@@ -328,7 +328,7 @@ class SkillEffectRenderer {
           this.renderBlackHole(ctx, e);
           break;
         case "whirlwind":
-          console.log('匹配到whirlwind!');
+          console.log("匹配到whirlwind!");
           this.renderWhirlwind(ctx, e);
           break;
         case "shield":
@@ -338,7 +338,7 @@ class SkillEffectRenderer {
           this.renderFloatingText(ctx, e);
           break;
         default:
-          console.warn('未匹配的effect type:', e.type);
+          console.warn("未匹配的effect type:", e.type);
       }
     });
 
