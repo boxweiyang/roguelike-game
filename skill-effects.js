@@ -441,7 +441,7 @@ class SkillEffectRenderer {
     ctx.fill();
   }
 
-  // 渲染旋风 - 霓虹光剑版
+  // 渲染旋风 - 霓虹光剑版（特效范围=伤害范围）
   renderWhirlwind(ctx, e) {
     const elapsed = Date.now() - e.startTime;
     const progress = elapsed / e.duration;
@@ -449,19 +449,24 @@ class SkillEffectRenderer {
     // 确保透明度为1
     ctx.globalAlpha = 1;
 
-    // 刀刃轨道半径
-    const orbitRadius = e.radius * 0.6;
+    // 刀刃轨道半径：让光剑尖端正好在伤害范围边缘
+    // e.radius = 伤害范围（150像素）
+    // 光剑长度 = 30像素
+    // 所以轨道半径 = 150 - 30 = 120像素
+    const bladeLength = 30;
+    const orbitRadius = e.radius - bladeLength; // 确保光剑尖端在范围边缘
     const bladeAngle = (Math.PI * 2) / e.bladeCount;
 
-    // 外圈能量环（霓虹版）
+    // 外圈能量环（霓虹版）- 严格在伤害范围边缘
     if (neonRenderer) {
-      // 多层光环
-      neonRenderer.drawEnergyRing(e.x, e.y, e.radius, '#00ffff', e.rotation * 0.5, 3);
-      neonRenderer.drawEnergyRing(e.x, e.y, e.radius * 0.9, '#00ffff', -e.rotation * 0.7, 2);
+      // 多层光环 - 都在伤害范围内
+      neonRenderer.drawEnergyRing(e.x, e.y, e.radius * 0.95, '#00ffff', e.rotation * 0.5, 3);
+      neonRenderer.drawEnergyRing(e.x, e.y, e.radius * 0.85, '#00ffff', -e.rotation * 0.7, 2);
       
-      // 爆炸波纹
+      // 启动爆炸波纹 - 不超过伤害范围
       if (progress < 0.3) {
-        neonRenderer.drawExplosionWave(e.x, e.y, e.radius * (1 + progress * 2), '#00ffff', 0.6);
+        const waveRadius = e.radius * (0.5 + progress * 1.5);
+        neonRenderer.drawExplosionWave(e.x, e.y, Math.min(waveRadius, e.radius), '#00ffff', 0.6);
       }
     }
 
@@ -471,10 +476,6 @@ class SkillEffectRenderer {
       const bladeX = e.x + Math.cos(angle) * orbitRadius;
       const bladeY = e.y + Math.sin(angle) * orbitRadius;
 
-      // 光剑主体 - 发光长条
-      const bladeLength = 30;
-      const bladeWidth = 4;
-      
       // 光剑方向（沿着旋转方向）
       const swordAngle = angle + Math.PI / 2;
       
@@ -494,7 +495,7 @@ class SkillEffectRenderer {
       gradient.addColorStop(1, 'rgba(255, 255, 255, 0.9)');
       
       ctx.strokeStyle = gradient;
-      ctx.lineWidth = bladeWidth;
+      ctx.lineWidth = 4;
       ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.moveTo(
@@ -522,7 +523,7 @@ class SkillEffectRenderer {
       );
       ctx.stroke();
 
-      // 光剑拖尾轨迹
+      // 光剑拖尾轨迹 - 在伤害范围内
       ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
       ctx.lineWidth = 6;
       ctx.shadowColor = '#00ffff';
@@ -531,7 +532,7 @@ class SkillEffectRenderer {
       ctx.arc(e.x, e.y, orbitRadius, angle - 0.8, angle);
       ctx.stroke();
       
-      // 粒子效果（刀刃尖端）
+      // 粒子效果（刀刃尖端）- 不超过伤害范围
       if (neonRenderer && Math.random() > 0.7) {
         const particleX = bladeX + Math.cos(swordAngle) * bladeLength;
         const particleY = bladeY + Math.sin(swordAngle) * bladeLength;
