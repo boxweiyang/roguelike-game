@@ -460,13 +460,33 @@ class SkillEffectRenderer {
     // 外圈能量环（霓虹版）- 严格在伤害范围边缘
     if (neonRenderer) {
       // 多层光环 - 都在伤害范围内
-      neonRenderer.drawEnergyRing(e.x, e.y, e.radius * 0.95, '#00ffff', e.rotation * 0.5, 3);
-      neonRenderer.drawEnergyRing(e.x, e.y, e.radius * 0.85, '#00ffff', -e.rotation * 0.7, 2);
-      
+      neonRenderer.drawEnergyRing(
+        e.x,
+        e.y,
+        e.radius * 0.95,
+        "#00ffff",
+        e.rotation * 0.5,
+        3,
+      );
+      neonRenderer.drawEnergyRing(
+        e.x,
+        e.y,
+        e.radius * 0.85,
+        "#00ffff",
+        -e.rotation * 0.7,
+        2,
+      );
+
       // 启动爆炸波纹 - 不超过伤害范围
       if (progress < 0.3) {
         const waveRadius = e.radius * (0.5 + progress * 1.5);
-        neonRenderer.drawExplosionWave(e.x, e.y, Math.min(waveRadius, e.radius), '#00ffff', 0.6);
+        neonRenderer.drawExplosionWave(
+          e.x,
+          e.y,
+          Math.min(waveRadius, e.radius),
+          "#00ffff",
+          0.6,
+        );
       }
     }
 
@@ -478,65 +498,65 @@ class SkillEffectRenderer {
 
       // 光剑方向（沿着旋转方向）
       const swordAngle = angle + Math.PI / 2;
-      
+
       // 光剑发光
-      ctx.shadowColor = '#00ffff';
+      ctx.shadowColor = "#00ffff";
       ctx.shadowBlur = 20;
-      
+
       // 光剑渐变
       const gradient = ctx.createLinearGradient(
         bladeX - Math.cos(swordAngle) * bladeLength,
         bladeY - Math.sin(swordAngle) * bladeLength,
         bladeX + Math.cos(swordAngle) * bladeLength,
-        bladeY + Math.sin(swordAngle) * bladeLength
+        bladeY + Math.sin(swordAngle) * bladeLength,
       );
-      gradient.addColorStop(0, 'rgba(0, 255, 255, 0.2)');
-      gradient.addColorStop(0.5, '#00ffff');
-      gradient.addColorStop(1, 'rgba(255, 255, 255, 0.9)');
-      
+      gradient.addColorStop(0, "rgba(0, 255, 255, 0.2)");
+      gradient.addColorStop(0.5, "#00ffff");
+      gradient.addColorStop(1, "rgba(255, 255, 255, 0.9)");
+
       ctx.strokeStyle = gradient;
       ctx.lineWidth = 4;
-      ctx.lineCap = 'round';
+      ctx.lineCap = "round";
       ctx.beginPath();
       ctx.moveTo(
         bladeX - Math.cos(swordAngle) * bladeLength,
-        bladeY - Math.sin(swordAngle) * bladeLength
+        bladeY - Math.sin(swordAngle) * bladeLength,
       );
       ctx.lineTo(
         bladeX + Math.cos(swordAngle) * bladeLength,
-        bladeY + Math.sin(swordAngle) * bladeLength
+        bladeY + Math.sin(swordAngle) * bladeLength,
       );
       ctx.stroke();
-      
+
       // 光剑核心（白色）
       ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#ffffff';
+      ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(
         bladeX - Math.cos(swordAngle) * bladeLength * 0.6,
-        bladeY - Math.sin(swordAngle) * bladeLength * 0.6
+        bladeY - Math.sin(swordAngle) * bladeLength * 0.6,
       );
       ctx.lineTo(
         bladeX + Math.cos(swordAngle) * bladeLength * 0.6,
-        bladeY + Math.sin(swordAngle) * bladeLength * 0.6
+        bladeY + Math.sin(swordAngle) * bladeLength * 0.6,
       );
       ctx.stroke();
 
       // 光剑拖尾轨迹 - 在伤害范围内
-      ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+      ctx.strokeStyle = "rgba(0, 255, 255, 0.3)";
       ctx.lineWidth = 6;
-      ctx.shadowColor = '#00ffff';
+      ctx.shadowColor = "#00ffff";
       ctx.shadowBlur = 15;
       ctx.beginPath();
       ctx.arc(e.x, e.y, orbitRadius, angle - 0.8, angle);
       ctx.stroke();
-      
+
       // 粒子效果（刀刃尖端）- 不超过伤害范围
       if (neonRenderer && Math.random() > 0.7) {
         const particleX = bladeX + Math.cos(swordAngle) * bladeLength;
         const particleY = bladeY + Math.sin(swordAngle) * bladeLength;
-        ctx.fillStyle = '#00ffff';
+        ctx.fillStyle = "#00ffff";
         ctx.globalAlpha = 0.8;
         ctx.beginPath();
         ctx.arc(particleX, particleY, 2, 0, Math.PI * 2);

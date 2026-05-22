@@ -164,13 +164,78 @@ function renderPlayer(ctx, p) {
   neonRenderer.drawGlowHexagon(x, y, size, "#00ffff", 20);
 
   // 玩家图标
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = '#ffffff';
   ctx.font = `${size * 0.9}px Arial`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.shadowColor = "#00ffff";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = '#00ffff';
   ctx.shadowBlur = 10;
-  ctx.fillText("🧙", x, y);
+  ctx.fillText('🧙', x, y);
+  ctx.shadowBlur = 0;
+
+  // 玩家血条和经验条（头顶显示）
+  const barWidth = 50;
+  const barHeight = 6;
+  const barSpacing = 3;
+  const barX = x - barWidth / 2;
+  const barY = y - size - 20;
+
+  // === 绿色血条 ===
+  // 血条背景
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
+
+  // 血条边框
+  ctx.strokeStyle = '#00ff00';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
+
+  // 血条填充 - 绿色渐变
+  const hpPercent = p.hp / p.maxHp;
+  const hpGradient = ctx.createLinearGradient(barX, barY, barX, barY + barHeight);
+  hpGradient.addColorStop(0, '#00ff00');
+  hpGradient.addColorStop(1, '#00cc00');
+  ctx.fillStyle = hpGradient;
+  ctx.fillRect(barX, barY, barWidth * hpPercent, barHeight);
+
+  // HP文字
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 9px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = '#000000';
+  ctx.shadowBlur = 2;
+  ctx.fillText(`${Math.floor(p.hp)}/${p.maxHp}`, x, barY + barHeight / 2);
+  ctx.shadowBlur = 0;
+
+  // === 蓝色经验条 ===
+  const expBarY = barY + barHeight + barSpacing;
+
+  // 经验条背景
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect(barX - 1, expBarY - 1, barWidth + 2, barHeight + 2);
+
+  // 经验条边框
+  ctx.strokeStyle = '#0088ff';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(barX - 1, expBarY - 1, barWidth + 2, barHeight + 2);
+
+  // 经验条填充 - 蓝色渐变
+  const expPercent = p.exp / (p.expToNext || 100);
+  const expGradient = ctx.createLinearGradient(barX, expBarY, barX, expBarY + barHeight);
+  expGradient.addColorStop(0, '#00aaff');
+  expGradient.addColorStop(1, '#0066cc');
+  ctx.fillStyle = expGradient;
+  ctx.fillRect(barX, expBarY, barWidth * expPercent, barHeight);
+
+  // 等级显示
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 11px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = '#0088ff';
+  ctx.shadowBlur = 5;
+  ctx.fillText(`Lv.${p.level || 1}`, x, expBarY - 8);
   ctx.shadowBlur = 0;
 }
 
@@ -215,18 +280,39 @@ function renderEnemies(ctx, enemies) {
     ctx.fillText(enemy.icon, x, y);
     ctx.shadowBlur = 0;
 
-    // 生命条
-    if (enemy.hp < enemy.maxHp) {
-      const barWidth = size * 2;
-      const barHeight = 4;
-      const barX = x - barWidth / 2;
-      const barY = y - size - 8;
+    // 生命条 - 常驻显示（霓虹版）
+    const barWidth = size * 2;
+    const barHeight = 5;
+    const barX = x - barWidth / 2;
+    const barY = y - size - 10;
 
-      ctx.fillStyle = "#333";
-      ctx.fillRect(barX, barY, barWidth, barHeight);
+    // 血条背景
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.fillRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
 
-      ctx.fillStyle = "#e74c3c";
-      ctx.fillRect(barX, barY, barWidth * (enemy.hp / enemy.maxHp), barHeight);
+    // 血条边框
+    ctx.strokeStyle = enemy.isBoss ? '#ff00ff' : '#ff3333';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(barX - 1, barY - 1, barWidth + 2, barHeight + 2);
+
+    // 血条填充 - 绿色
+    const hpPercent = enemy.hp / enemy.maxHp;
+    const hpGradient = ctx.createLinearGradient(barX, barY, barX, barY + barHeight);
+    hpGradient.addColorStop(0, '#00ff00');
+    hpGradient.addColorStop(1, '#00cc00');
+    ctx.fillStyle = hpGradient;
+    ctx.fillRect(barX, barY, barWidth * hpPercent, barHeight);
+
+    // Boss等级标记
+    if (enemy.isBoss || enemy.level > 1) {
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 10px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = '#ff00ff';
+      ctx.shadowBlur = 5;
+      ctx.fillText(`Lv.${enemy.level || 1}`, x, barY - 8);
+      ctx.shadowBlur = 0;
     }
   }
 }
