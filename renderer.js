@@ -170,7 +170,7 @@ function renderPlayer(ctx, p) {
   ctx.textBaseline = "middle";
   ctx.shadowColor = "#00ffff";
   ctx.shadowBlur = 10;
-  ctx.fillText('🧙', x, y);
+  ctx.fillText("🧙", x, y);
   ctx.shadowBlur = 0;
 
   // 玩家血条和经验条（头顶显示）
@@ -181,9 +181,15 @@ function renderPlayer(ctx, p) {
   const barY = y - size - 16;
 
   // === 绿色血条 ===
-  const currentHp = p.hp !== undefined ? p.hp : (gameState.playerStats && gameState.playerStats.currentHp);
-  const maxHp = p.maxHp !== undefined ? p.maxHp : (gameState.playerStats && gameState.playerStats.maxHp);
-  
+  const currentHp =
+    p.hp !== undefined
+      ? p.hp
+      : gameState.playerStats && gameState.playerStats.currentHp;
+  const maxHp =
+    p.maxHp !== undefined
+      ? p.maxHp
+      : gameState.playerStats && gameState.playerStats.maxHp;
+
   if (currentHp !== undefined && maxHp && maxHp > 0) {
     // 血条背景
     ctx.fillStyle = "#333";
@@ -197,10 +203,10 @@ function renderPlayer(ctx, p) {
 
   // === 蓝色经验条 ===
   const expBarY = barY + barHeight + barSpacing;
-  
+
   const currentXp = p.xp || 0;
   const xpToNext = p.xpToNext || 100;
-  
+
   if (xpToNext > 0) {
     // 经验条背景
     ctx.fillStyle = "#333";
