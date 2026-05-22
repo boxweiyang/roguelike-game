@@ -149,7 +149,7 @@ class SkillEffectRenderer {
   }
 
   // 创建旋风效果
-  createWhirlwind(x, y, radius, bladeCount, duration = 2000, player = null) {
+  createWhirlwind(x, y, radius, bladeCount, duration = 2000, player = null, skillId = 'death_whirlwind') {
     this.effects.push({
       x: x,
       y: y,
@@ -160,6 +160,7 @@ class SkillEffectRenderer {
       type: "whirlwind",
       rotation: 0,
       player: player, // 保存player引用以便跟随
+      skillId: skillId, // 保存skillId用于颜色
     });
   }
 

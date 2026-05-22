@@ -290,22 +290,70 @@ function renderEnemies(ctx, enemies) {
   }
 }
 
-// 渲染投射物
+// 渲染投射物 - 霓虹风格
 function renderProjectiles(ctx, projectiles) {
   for (const proj of projectiles) {
-    const x = proj.x * CONFIG.TILE_SIZE;
-    const y = proj.y * CONFIG.TILE_SIZE;
-    const size = CONFIG.TILE_SIZE * proj.size;
+    const x = proj.x;
+    const y = proj.y;
+    const size = proj.size || 5;
+    
+    // 获取技能颜色
+    const colors = proj.skillId ? SKILL_COLORS[proj.skillId] : null;
+    const color = colors ? colors.primary : (proj.color || '#ffffff');
 
-    ctx.fillStyle = proj.color;
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
-
-    // 发光效果
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = proj.color;
-    ctx.fill();
+    // 投射物主体
+    ctx.fillStyle = color;
+    ctx.shadowColor = colors ? colors.glow : color;
+    ctx.shadowBlur = 15;
+    
+    // 根据类型绘制不同形状
+    if (proj.type === 'fireball') {
+      // 火球 - 大圆形
+      ctx.beginPath();
+      ctx.arc(x, y, size * 2, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 内部高光
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (proj.type === 'missile') {
+      // 飞弹 - 长条形
+      ctx.save();
+      const angle = Math.atan2(proj.targetY - y, proj.targetX - x) || 0;
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.fillRect(-size * 2, -size / 2, size * 4, size);
+      ctx.restore();
+    } else if (proj.type === 'bullet') {
+      // 子弹 - 小圆形
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (proj.type === 'star') {
+      // 星辰 - 星形
+      ctx.beginPath();
+      for (let i = 0; i < 5; i++) {
+        const angle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
+        const outerX = x + Math.cos(angle) * size * 2;
+        const outerY = y + Math.sin(angle) * size * 2;
+        const innerAngle = angle + Math.PI / 5;
+        const innerX = x + Math.cos(innerAngle) * size;
+        const innerY = y + Math.sin(innerAngle) * size;
+        if (i === 0) ctx.moveTo(outerX, outerY);
+        else ctx.lineTo(outerX, outerY);
+        ctx.lineTo(innerX, innerY);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else {
+      // 默认圆形
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
     ctx.shadowBlur = 0;
   }
 }
@@ -317,14 +365,24 @@ function renderOrbitals(ctx, orbitals, player) {
     const oy = (player.y + Math.sin(orb.angle) * orb.radius) * CONFIG.TILE_SIZE;
     const size = CONFIG.TILE_SIZE * orb.size;
 
-    ctx.fillStyle = "#9b59b6";
-    ctx.beginPath();
-    ctx.arc(ox, oy, size, 0, Math.PI * 2);
-    ctx.fill();
+    // 获取技能颜色
+    const colors = orb.skillId ? SKILL_COLORS[orb.skillId] : null;
+    const color = colors ? colors.primary : '#9b59b6';
 
+    // 环绕物主体
+    ctx.fillStyle = color;
+    ctx.shadowColor = colors ? colors.glow : color;
     ctx.shadowBlur = 15;
-    ctx.shadowColor = "#9b59b6";
+    
+    // 绘制菱形
+    ctx.beginPath();
+    ctx.moveTo(ox, oy - size * 1.5);
+    ctx.lineTo(ox + size, oy);
+    ctx.lineTo(ox, oy + size * 1.5);
+    ctx.lineTo(ox - size, oy);
+    ctx.closePath();
     ctx.fill();
+    
     ctx.shadowBlur = 0;
   }
 }
