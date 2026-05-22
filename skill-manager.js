@@ -357,6 +357,7 @@ class SkillManager {
         bladeCount,
         2000,
         player, // 传入player引用
+        'death_whirlwind' // 传入skillId用于颜色
       );
     }
 
@@ -388,12 +389,13 @@ class SkillManager {
     targets.forEach((target) => {
       // 创建闪电特效（转换为像素坐标）
       if (this.skillEffects) {
+        const colors = SKILL_COLORS.thunderstorm;
         this.skillEffects.createLightning(
           player.x * CONFIG.TILE_SIZE,
           player.y * CONFIG.TILE_SIZE - 30,
           target.x * CONFIG.TILE_SIZE,
           target.y * CONFIG.TILE_SIZE,
-          "#00ffff",
+          colors.primary,
           3,
         );
       }
@@ -422,6 +424,7 @@ class SkillManager {
         targetY: targetY,
         damage: damage,
         type: "fireball",
+        skillId: 'hellfire_rain', // 用于颜色
         speed: 5,
         range: range * 0.6,
       });
@@ -443,6 +446,7 @@ class SkillManager {
         radius: range,
         damage: damage,
         speed: 0.05,
+        skillId: 'blade_storm', // 用于颜色
         lastHit: new Set(),
       });
     }
@@ -462,6 +466,7 @@ class SkillManager {
         target: target,
         damage: damage,
         type: "missile",
+        skillId: 'explosive_missiles', // 用于颜色
         speed: 4,
         homing: true,
         explosionRadius: levelData.explosionRadius * CONFIG.TILE_SIZE || 100,
@@ -517,6 +522,7 @@ class SkillManager {
       targetY: target.y * CONFIG.TILE_SIZE,
       damage: damage,
       type: "bullet",
+      skillId: 'sniper_shot', // 用于颜色
       speed: 15,
       pierce: levelData.pierce || 0,
       critChance: levelData.critChance || 0,
@@ -657,6 +663,7 @@ class SkillManager {
         targetY: targetY,
         damage: damage,
         type: "star",
+        skillId: 'starfall', // 用于颜色
         speed: 6,
         range: 80,
       });
