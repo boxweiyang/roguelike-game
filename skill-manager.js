@@ -526,26 +526,26 @@ class SkillManager {
   // 执行AOE控制（如冰霜新星）
   executeAOEControl(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
-    
+
     // 清除旧冰霜特效
     if (this.skillEffects) {
       this.skillEffects.effects = this.skillEffects.effects.filter(
-        e => e.type !== 'frost'
+        (e) => e.type !== "frost",
       );
-          
+
       this.skillEffects.createFrostEffect(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
-        range
+        range,
       );
     }
-    
+
     // 对范围内敌人造成伤害并减速
     enemies.forEach((enemy) => {
       const dist = Math.sqrt(
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
-    
+
       if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
         enemy.slowed = true;
@@ -553,34 +553,34 @@ class SkillManager {
       }
     });
   }
-  
+
   // 执行持续AOE（如死亡之握）
   executeDotAOE(player, enemies, levelData, damage) {
     const range = levelData.range * CONFIG.TILE_SIZE;
     const duration = levelData.duration || 3000;
-  
+
     // 清除旧特效
     if (this.skillEffects) {
       this.skillEffects.effects = this.skillEffects.effects.filter(
-        e => e.type !== 'fire'
+        (e) => e.type !== "fire",
       );
-  
+
       // 创建黑暗能量场
       this.skillEffects.createFireEffect(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range,
         duration,
-        '#8b00ff'
+        "#8b00ff",
       );
     }
-  
+
     // 对范围内敌人造成持续伤害
     enemies.forEach((enemy) => {
       const dist = Math.sqrt(
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
-  
+
       if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
         // 吸血效果
@@ -590,43 +590,43 @@ class SkillManager {
       }
     });
   }
-  
+
   // 执行防御技能（如神圣护盾）
   executeDefense(player, enemies, levelData, damage) {
     const range = levelData.shieldRange * CONFIG.TILE_SIZE || 100;
     const duration = levelData.duration || 5000;
-  
+
     // 创建护盾特效
     if (this.skillEffects) {
       this.skillEffects.createShield(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range,
-        '#ffd700'
+        "#ffd700",
       );
     }
-  
+
     // 添加护盾状态
     player.shield = (player.shield || 0) + levelData.shieldAmount || 50;
     player.shieldDuration = duration;
   }
-  
+
   // 执行持续恢复（如生命汲取）
   executeSustain(player, enemies, levelData, damage) {
     const healAmount = levelData.healAmount || 10;
-      
+
     // 恢复生命
     if (player.hp < player.maxHp) {
       player.hp = Math.min(player.maxHp, player.hp + healAmount);
     }
-  
+
     // 对范围内敌人造成伤害并吸血
     const range = levelData.range * CONFIG.TILE_SIZE;
     enemies.forEach((enemy) => {
       const dist = Math.sqrt(
         Math.pow(enemy.x - player.x, 2) + Math.pow(enemy.y - player.y, 2),
       );
-  
+
       if (dist <= levelData.range) {
         this.dealDamage(enemy, damage);
         // 额外吸血
@@ -636,17 +636,19 @@ class SkillManager {
       }
     });
   }
-  
+
   // 执行随机AOE（如星辰坠落）
   executeRandomAOE(player, enemies, levelData, damage) {
     const count = levelData.stars || 5;
     const range = levelData.range * CONFIG.TILE_SIZE;
-  
+
     for (let i = 0; i < count; i++) {
       // 随机选择目标位置
-      const targetX = player.x * CONFIG.TILE_SIZE + (Math.random() - 0.5) * range * 2;
-      const targetY = player.y * CONFIG.TILE_SIZE + (Math.random() - 0.5) * range * 2;
-  
+      const targetX =
+        player.x * CONFIG.TILE_SIZE + (Math.random() - 0.5) * range * 2;
+      const targetY =
+        player.y * CONFIG.TILE_SIZE + (Math.random() - 0.5) * range * 2;
+
       // 添加投射物（星辰）
       this.projectiles.push({
         x: targetX,
@@ -654,44 +656,49 @@ class SkillManager {
         targetX: targetX,
         targetY: targetY,
         damage: damage,
-        type: 'star',
+        type: "star",
         speed: 6,
         range: 80,
       });
     }
   }
-  
+
   // 执行随机增益（如幸运轮盘）
   executeRandomBuff(player, enemies, levelData, damage) {
     // 随机选择一个增益效果
-    const buffs = ['damage_boost', 'speed_boost', 'defense_boost', 'cooldown_reduction'];
+    const buffs = [
+      "damage_boost",
+      "speed_boost",
+      "defense_boost",
+      "cooldown_reduction",
+    ];
     const randomBuff = buffs[Math.floor(Math.random() * buffs.length)];
-  
+
     // 应用增益
     if (!player.buffs) player.buffs = {};
     player.buffs[randomBuff] = {
       duration: levelData.duration || 5000,
-      value: levelData.buffValue || 0.2
+      value: levelData.buffValue || 0.2,
     };
-  
+
     // 创建特效
     if (this.skillEffects) {
       this.skillEffects.createExplosion(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
-        '#ffff00',
+        "#ffff00",
         15,
         4,
-        2
+        2,
       );
     }
   }
-  
+
   // 执行召唤（如镜像分身）
   executeSummon(player, enemies, levelData, damage) {
     const count = levelData.clones || 1;
     const duration = levelData.duration || 10000;
-  
+
     // 创建分身特效
     if (this.skillEffects) {
       for (let i = 0; i < count; i++) {
@@ -699,22 +706,15 @@ class SkillManager {
         const dist = 100;
         const cloneX = player.x * CONFIG.TILE_SIZE + Math.cos(angle) * dist;
         const cloneY = player.y * CONFIG.TILE_SIZE + Math.sin(angle) * dist;
-  
-        this.skillEffects.createExplosion(
-          cloneX,
-          cloneY,
-          '#00ffff',
-          10,
-          3,
-          2
-        );
+
+        this.skillEffects.createExplosion(cloneX, cloneY, "#00ffff", 10, 3, 2);
       }
     }
-  
+
     // 注意：实际的分身逻辑需要在game.js中实现
     // 这里只负责特效
   }
-  
+
   // 执行被动触发（如连锁爆炸）
   executePassiveTrigger(player, enemies, levelData, damage) {
     // 这个技能由敌人死亡时触发
@@ -722,15 +722,19 @@ class SkillManager {
     // 这里创建爆炸特效
     if (this.skillEffects && enemies.length > 0) {
       // 对最近的敌人造成爆炸伤害
-      const target = this.findNearestEnemy(player, enemies, levelData.range * CONFIG.TILE_SIZE);
+      const target = this.findNearestEnemy(
+        player,
+        enemies,
+        levelData.range * CONFIG.TILE_SIZE,
+      );
       if (target) {
         this.skillEffects.createExplosion(
           target.x * CONFIG.TILE_SIZE,
           target.y * CONFIG.TILE_SIZE,
-          '#ff6600',
+          "#ff6600",
           20,
           6,
-          3
+          3,
         );
         this.dealDamage(target, damage);
       }

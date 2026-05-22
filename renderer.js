@@ -8,6 +8,7 @@ let gameCanvas = null;
 let gameCtx = null;
 let minimapCanvas = null;
 let minimapCtx = null;
+let neonRenderer = null; // 霓虹渲染器
 
 // 初始化Canvas
 function initRender() {
@@ -15,7 +16,8 @@ function initRender() {
   gameCtx = gameCanvas.getContext("2d");
   minimapCanvas = document.getElementById("minimapCanvas");
   minimapCtx = minimapCanvas.getContext("2d");
-  console.log("渲染系统初始化完成");
+  neonRenderer = new NeonRenderer(gameCtx); // 初始化霓虹渲染器
+  console.log("渲染系统初始化完成（含霓虹效果）");
 }
 
 // 主渲染函数
@@ -129,64 +131,89 @@ function renderGrid(ctx) {
   );
 }
 
-// 渲染玩家
+// 渲染玩家 - 霓虹赛博朋克风格
 function renderPlayer(ctx, p) {
   const x = p.x * CONFIG.TILE_SIZE;
   const y = p.y * CONFIG.TILE_SIZE;
-  const size = CONFIG.TILE_SIZE * 0.4;
+  const size = CONFIG.TILE_SIZE * 0.35;
 
-  // 玩家身体
-  ctx.fillStyle = "#3498db";
-  ctx.beginPath();
-  ctx.arc(x, y, size, 0, Math.PI * 2);
-  ctx.fill();
+  // 玩家拖尾粒子
+  if (!p.trailParticles) p.trailParticles = [];
+  
+  // 移动时添加拖尾
+  if (p.lastX && p.lastY) {
+    const moved = Math.abs(p.x - p.lastX) + Math.abs(p.y - p.lastY);
+    if (moved > 0.1) {
+      p.trailParticles.push(
+        neonRenderer.createTrailParticle(x, y, '#00ffff', 4, 15)
+      );
+    }
+  }
+  p.lastX = p.x;
+  p.lastY = p.y;
+  
+  // 渲染拖尾
+  neonRenderer.updateAndRenderTrail(p.trailParticles);
 
-  // 玩家边框
-  ctx.strokeStyle = "#2980b9";
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // 旋转能量环
+  const time = Date.now() * 0.003;
+  neonRenderer.drawEnergyRing(x, y, size + 8, '#00ffff', time, 2);
+  neonRenderer.drawEnergyRing(x, y, size + 12, '#00ffff', -time * 0.7, 1.5);
+
+  // 玩家主体 - 六边形机甲
+  neonRenderer.drawGlowHexagon(x, y, size, '#00ffff', 20);
 
   // 玩家图标
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `${size}px Arial`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("🧙", x, y);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `${size * 0.9}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = '#00ffff';
+  ctx.shadowBlur = 10;
+  ctx.fillText('🧙', x, y);
+  ctx.shadowBlur = 0;
 }
 
-// 渲染敌人
+// 渲染敌人 - 霓虹赛博朋克风格
 function renderEnemies(ctx, enemies) {
   for (const enemy of enemies) {
     const x = enemy.x * CONFIG.TILE_SIZE;
     const y = enemy.y * CONFIG.TILE_SIZE;
-    const size = CONFIG.TILE_SIZE * enemy.size * 0.5;
+    const size = CONFIG.TILE_SIZE * enemy.size * 0.45;
 
-    // 受击闪烁
-    if (enemy.hitFlash > 0) {
-      ctx.fillStyle = "#ffffff";
-      enemy.hitFlash--;
+    // 根据敌人类型选择形状
+    if (enemy.isBoss) {
+      // Boss - 大型六边形 + 紫色光晕
+      neonRenderer.drawGlowHexagon(x, y, size, '#ff00ff', 25);
+      
+      // Boss核心
+      neonRenderer.drawGlowCircle(x, y, size * 0.4, '#ffffff', 15);
+      
+      // 环绕能量
+      const time = Date.now() * 0.002;
+      neonRenderer.drawEnergyRing(x, y, size + 15, '#ff00ff', time, 2);
+    } else if (enemy.isElite) {
+      // 精英 - 中型菱形 + 橙色光晕
+      neonRenderer.drawGlowDiamond(x, y, size, '#ff6600', 18);
     } else {
-      ctx.fillStyle = enemy.color;
+      // 普通 - 小型三角/圆形 + 红色光晕
+      if (enemy.hitFlash > 0) {
+        neonRenderer.drawGlowCircle(x, y, size, '#ffffff', 15);
+        enemy.hitFlash--;
+      } else {
+        neonRenderer.drawGlowCircle(x, y, size, enemy.color || '#ff3333', 12);
+      }
     }
-
-    // 敌人身体
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
 
     // 敌人图标
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `${size * 1.2}px Arial`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `${size * 1.1}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = enemy.isBoss ? '#ff00ff' : '#ff3333';
+    ctx.shadowBlur = 8;
     ctx.fillText(enemy.icon, x, y);
-
-    // Boss标记
-    if (enemy.isBoss) {
-      ctx.strokeStyle = "#f39c12";
-      ctx.lineWidth = 3;
-      ctx.stroke();
-    }
+    ctx.shadowBlur = 0;
 
     // 生命条
     if (enemy.hp < enemy.maxHp) {
