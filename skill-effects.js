@@ -35,7 +35,7 @@ class SkillEffectRenderer {
   }
 
   // 创建火焰效果
-  createFireEffect(x, y, radius, duration = 1000, skillId = 'death_grasp') {
+  createFireEffect(x, y, radius, duration = 1000, skillId = "death_grasp") {
     this.effects.push({
       x: x,
       y: y,
@@ -101,7 +101,7 @@ class SkillEffectRenderer {
   }
 
   // 创建冰霜效果
-  createFrostEffect(x, y, radius, skillId = 'frost_nova') {
+  createFrostEffect(x, y, radius, skillId = "frost_nova") {
     this.effects.push({
       x: x,
       y: y,
@@ -125,7 +125,7 @@ class SkillEffectRenderer {
   }
 
   // 创建黑洞效果
-  createBlackHole(x, y, radius, duration = 5000, skillId = 'black_hole') {
+  createBlackHole(x, y, radius, duration = 5000, skillId = "black_hole") {
     this.effects.push({
       x: x,
       y: y,
@@ -176,7 +176,7 @@ class SkillEffectRenderer {
   }
 
   // 创建护盾效果
-  createShield(x, y, radius, skillId = 'holy_shield') {
+  createShield(x, y, radius, skillId = "holy_shield") {
     const colors = SKILL_COLORS[skillId];
     this.effects.push({
       x: x,
@@ -381,30 +381,45 @@ class SkillEffectRenderer {
 
   // 渲染火焰
   renderFire(ctx, e) {
+    const colors = e.skillId ? SKILL_COLORS[e.skillId] : null;
+    const primaryColor = colors ? colors.primary : '#ff6400';
     const flicker = Math.sin(Date.now() * 0.01) * 0.2 + 0.8;
 
-    // 火焰底色
-    ctx.fillStyle = `rgba(255, 100, 0, ${0.3 * flicker})`;
+    // 设置霓虹发光效果
+    ctx.shadowColor = colors ? colors.glow : primaryColor;
+    ctx.shadowBlur = 15;
+
+    // 火焰底色 - 使用技能颜色
+    ctx.fillStyle = primaryColor;
+    ctx.globalAlpha = 0.3 * flicker;
     ctx.beginPath();
     ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
     ctx.fill();
 
-    // 火焰粒子
+    // 火焰粒子 - 使用技能颜色
     e.particles.forEach((p) => {
       const alpha = p.life / 40;
-      ctx.fillStyle = `rgba(255, ${150 + Math.random() * 105}, 0, ${alpha})`;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = primaryColor;
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fill();
     });
+    
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
   }
 
   // 渲染冰霜
   renderFrost(ctx, e) {
-    ctx.strokeStyle = "#00ffff";
+    const colors = e.skillId ? SKILL_COLORS[e.skillId] : null;
+    const primaryColor = colors ? colors.primary : '#00ccff';
+
+    // 设置霓虹发光效果
+    ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
-    ctx.shadowColor = "#00ffff";
-    ctx.shadowBlur = 5;
+    ctx.shadowColor = colors ? colors.glow : primaryColor;
+    ctx.shadowBlur = 10;
 
     // 冰晶
     e.crystals.forEach((c) => {
@@ -418,41 +433,54 @@ class SkillEffectRenderer {
     });
 
     // 冰霜区域
-    ctx.fillStyle = "rgba(0, 255, 255, 0.2)";
+    ctx.fillStyle = primaryColor;
+    ctx.globalAlpha = 0.2;
     ctx.beginPath();
     ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
     ctx.fill();
-
+    
+    ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
   }
 
   // 渲染黑洞
   renderBlackHole(ctx, e) {
+    const colors = e.skillId ? SKILL_COLORS[e.skillId] : null;
+    const primaryColor = colors ? colors.primary : '#8b00ff';
     const pulse = Math.sin(Date.now() * 0.005) * 0.1 + 1;
 
-    // 外层光环
-    ctx.strokeStyle = `rgba(128, 0, 128, 0.6)`;
+    // 设置霓虹发光效果
+    ctx.shadowColor = colors ? colors.glow : primaryColor;
+    ctx.shadowBlur = 15;
+
+    // 外层光环 - 使用技能颜色
+    ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 3;
+    ctx.globalAlpha = 0.6;
     ctx.beginPath();
     ctx.arc(e.x, e.y, e.radius * pulse, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 旋转粒子
+    // 旋转粒子 - 使用技能颜色
     e.particles.forEach((p) => {
       const px = e.x + Math.cos(p.angle) * p.dist;
       const py = e.y + Math.sin(p.angle) * p.dist;
 
-      ctx.fillStyle = `rgba(128, 0, 128, 0.8)`;
+      ctx.globalAlpha = 0.8;
+      ctx.fillStyle = primaryColor;
       ctx.beginPath();
       ctx.arc(px, py, p.size, 0, Math.PI * 2);
       ctx.fill();
     });
 
     // 中心黑洞
+    ctx.globalAlpha = 1;
     ctx.fillStyle = "#000";
     ctx.beginPath();
     ctx.arc(e.x, e.y, e.radius * 0.3, 0, Math.PI * 2);
     ctx.fill();
+    
+    ctx.shadowBlur = 0;
   }
 
   // 渲染旋风 - 霓虹光剑版（特效范围=伤害范围）
@@ -584,22 +612,26 @@ class SkillEffectRenderer {
 
   // 渲染护盾
   renderShield(ctx, e) {
+    const colors = e.skillId ? SKILL_COLORS[e.skillId] : null;
+    const primaryColor = colors ? colors.primary : e.color;
     const pulse = Math.sin(Date.now() * 0.003) * 0.1 + 0.9;
 
-    ctx.strokeStyle = e.color;
+    ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 4;
     ctx.globalAlpha = e.alpha * pulse;
-    ctx.shadowColor = e.color;
+    ctx.shadowColor = colors ? colors.glow : primaryColor;
     ctx.shadowBlur = 15;
 
     ctx.beginPath();
     ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
     ctx.stroke();
 
-    // 护盾内部
-    ctx.fillStyle = `rgba(255, 215, 0, 0.1)`;
+    // 护盾内部 - 使用技能颜色
+    ctx.fillStyle = colors ? colors.primary : 'rgba(255, 215, 0, 0.1)';
+    ctx.globalAlpha = 0.1 * pulse;
     ctx.fill();
 
+    ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
   }
 

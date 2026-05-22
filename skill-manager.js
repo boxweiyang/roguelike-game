@@ -490,7 +490,7 @@ class SkillManager {
         player.y * CONFIG.TILE_SIZE,
         range,
         duration,
-        'black_hole' // 传入skillId用于颜色
+        "black_hole", // 传入skillId用于颜色
       );
     }
 
@@ -544,7 +544,7 @@ class SkillManager {
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range,
-        'frost_nova' // 传入skillId用于颜色
+        "frost_nova", // 传入skillId用于颜色
       );
     }
 
@@ -579,7 +579,7 @@ class SkillManager {
         player.y * CONFIG.TILE_SIZE,
         range,
         duration,
-        'death_grasp' // 传入skillId用于颜色
+        "death_grasp", // 传入skillId用于颜色
       );
     }
 
@@ -610,7 +610,7 @@ class SkillManager {
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range,
-        'holy_shield' // 传入skillId用于颜色
+        "holy_shield", // 传入skillId用于颜色
       );
     }
 
@@ -718,7 +718,14 @@ class SkillManager {
         const cloneX = player.x * CONFIG.TILE_SIZE + Math.cos(angle) * dist;
         const cloneY = player.y * CONFIG.TILE_SIZE + Math.sin(angle) * dist;
 
-        this.skillEffects.createExplosion(cloneX, cloneY, colors.primary, 10, 3, 2);
+        this.skillEffects.createExplosion(
+          cloneX,
+          cloneY,
+          colors.primary,
+          10,
+          3,
+          2,
+        );
       }
     }
 
