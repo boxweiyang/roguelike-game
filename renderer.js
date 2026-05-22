@@ -225,52 +225,6 @@ function renderPlayer(ctx, p) {
   }
 }
 
-  // 玩家血条和经验条（头顶显示，参考怪物血条样式）
-  const barWidth = 50;
-  const barHeight = 4;
-  const barSpacing = 2;
-  const barX = x - barWidth / 2;
-  const barY = y - size - 16;
-
-  // === 绿色血条 ===
-  if (p.hp !== undefined && p.maxHp && p.maxHp > 0) {
-    // 血条背景
-    ctx.fillStyle = "#333";
-    ctx.fillRect(barX, barY, barWidth, barHeight);
-
-    // 血条填充 - 绿色（单色，和怪物血条一样的样式）
-    const hpPercent = Math.max(0, Math.min(1, p.hp / p.maxHp));
-    ctx.fillStyle = "#00ff00";
-    ctx.fillRect(barX, barY, barWidth * hpPercent, barHeight);
-  }
-
-  // === 蓝色经验条 ===
-  const expBarY = barY + barHeight + barSpacing;
-
-  if (p.exp !== undefined && p.expToNext && p.expToNext > 0) {
-    // 经验条背景
-    ctx.fillStyle = "#333";
-    ctx.fillRect(barX, expBarY, barWidth, barHeight);
-
-    // 经验条填充 - 蓝色（单色）
-    const expPercent = Math.max(0, Math.min(1, p.exp / p.expToNext));
-    ctx.fillStyle = "#0088ff";
-    ctx.fillRect(barX, expBarY, barWidth * expPercent, barHeight);
-  }
-
-  // 等级显示（在血条上方，不重叠）
-  if (p.level) {
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 10px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.shadowColor = "#000000";
-    ctx.shadowBlur = 3;
-    ctx.fillText(`Lv.${p.level}`, x, barY - 7);
-    ctx.shadowBlur = 0;
-  }
-}
-
 // 渲染敌人 - 霓虹赛博朋克风格
 function renderEnemies(ctx, enemies) {
   for (const enemy of enemies) {
