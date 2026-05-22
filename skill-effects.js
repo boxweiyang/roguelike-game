@@ -441,58 +441,107 @@ class SkillEffectRenderer {
     ctx.fill();
   }
 
-  // 渲染旋风
+  // 渲染旋风 - 霓虹光剑版
   renderWhirlwind(ctx, e) {
-    console.log(
-      "renderWhirlwind被调用: x=",
-      e.x,
-      "y=",
-      e.y,
-      "radius=",
-      e.radius,
-    );
-    console.log("  globalAlpha=", ctx.globalAlpha);
-
     const elapsed = Date.now() - e.startTime;
     const progress = elapsed / e.duration;
 
     // 确保透明度为1
     ctx.globalAlpha = 1;
 
-    // 刀刃应该在半径内旋转，而不是在半径边缘
-    const orbitRadius = e.radius * 0.6; // 使用60%的半径作为旋转轨道
+    // 刀刃轨道半径
+    const orbitRadius = e.radius * 0.6;
     const bladeAngle = (Math.PI * 2) / e.bladeCount;
 
-    // 绘制外圈光环
-    ctx.strokeStyle = "rgba(0, 255, 100, 0.3)";
-    ctx.lineWidth = 2;
-    ctx.shadowColor = "#00ff66";
-    ctx.shadowBlur = 15;
-    ctx.beginPath();
-    ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
-    ctx.stroke();
+    // 外圈能量环（霓虹版）
+    if (neonRenderer) {
+      // 多层光环
+      neonRenderer.drawEnergyRing(e.x, e.y, e.radius, '#00ffff', e.rotation * 0.5, 3);
+      neonRenderer.drawEnergyRing(e.x, e.y, e.radius * 0.9, '#00ffff', -e.rotation * 0.7, 2);
+      
+      // 爆炸波纹
+      if (progress < 0.3) {
+        neonRenderer.drawExplosionWave(e.x, e.y, e.radius * (1 + progress * 2), '#00ffff', 0.6);
+      }
+    }
 
-    // 绘制旋转的刀刃
+    // 绘制光剑刀刃（霓虹版）
     for (let i = 0; i < e.bladeCount; i++) {
       const angle = e.rotation + bladeAngle * i;
-      const x = e.x + Math.cos(angle) * orbitRadius;
-      const y = e.y + Math.sin(angle) * orbitRadius;
+      const bladeX = e.x + Math.cos(angle) * orbitRadius;
+      const bladeY = e.y + Math.sin(angle) * orbitRadius;
 
-      // 刀刃
-      ctx.fillStyle = "#00ff66";
-      ctx.shadowColor = "#00ff66";
-      ctx.shadowBlur = 10;
-
+      // 光剑主体 - 发光长条
+      const bladeLength = 30;
+      const bladeWidth = 4;
+      
+      // 光剑方向（沿着旋转方向）
+      const swordAngle = angle + Math.PI / 2;
+      
+      // 光剑发光
+      ctx.shadowColor = '#00ffff';
+      ctx.shadowBlur = 20;
+      
+      // 光剑渐变
+      const gradient = ctx.createLinearGradient(
+        bladeX - Math.cos(swordAngle) * bladeLength,
+        bladeY - Math.sin(swordAngle) * bladeLength,
+        bladeX + Math.cos(swordAngle) * bladeLength,
+        bladeY + Math.sin(swordAngle) * bladeLength
+      );
+      gradient.addColorStop(0, 'rgba(0, 255, 255, 0.2)');
+      gradient.addColorStop(0.5, '#00ffff');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0.9)');
+      
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = bladeWidth;
+      ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.arc(x, y, 6, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 轨迹
-      ctx.strokeStyle = "rgba(0, 255, 102, 0.4)";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(e.x, e.y, orbitRadius, angle - 0.6, angle);
+      ctx.moveTo(
+        bladeX - Math.cos(swordAngle) * bladeLength,
+        bladeY - Math.sin(swordAngle) * bladeLength
+      );
+      ctx.lineTo(
+        bladeX + Math.cos(swordAngle) * bladeLength,
+        bladeY + Math.sin(swordAngle) * bladeLength
+      );
       ctx.stroke();
+      
+      // 光剑核心（白色）
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(
+        bladeX - Math.cos(swordAngle) * bladeLength * 0.6,
+        bladeY - Math.sin(swordAngle) * bladeLength * 0.6
+      );
+      ctx.lineTo(
+        bladeX + Math.cos(swordAngle) * bladeLength * 0.6,
+        bladeY + Math.sin(swordAngle) * bladeLength * 0.6
+      );
+      ctx.stroke();
+
+      // 光剑拖尾轨迹
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.3)';
+      ctx.lineWidth = 6;
+      ctx.shadowColor = '#00ffff';
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, orbitRadius, angle - 0.8, angle);
+      ctx.stroke();
+      
+      // 粒子效果（刀刃尖端）
+      if (neonRenderer && Math.random() > 0.7) {
+        const particleX = bladeX + Math.cos(swordAngle) * bladeLength;
+        const particleY = bladeY + Math.sin(swordAngle) * bladeLength;
+        ctx.fillStyle = '#00ffff';
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.arc(particleX, particleY, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
     }
 
     ctx.shadowBlur = 0;
