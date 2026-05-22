@@ -35,7 +35,7 @@ class SkillEffectRenderer {
   }
 
   // 创建火焰效果
-  createFireEffect(x, y, radius, duration = 1000) {
+  createFireEffect(x, y, radius, duration = 1000, skillId = 'death_grasp') {
     this.effects.push({
       x: x,
       y: y,
@@ -43,6 +43,7 @@ class SkillEffectRenderer {
       startTime: Date.now(),
       duration: duration,
       type: "fire",
+      skillId: skillId, // 用于颜色
       particles: [],
     });
 
@@ -100,7 +101,7 @@ class SkillEffectRenderer {
   }
 
   // 创建冰霜效果
-  createFrostEffect(x, y, radius) {
+  createFrostEffect(x, y, radius, skillId = 'frost_nova') {
     this.effects.push({
       x: x,
       y: y,
@@ -108,6 +109,7 @@ class SkillEffectRenderer {
       startTime: Date.now(),
       duration: 2000,
       type: "frost",
+      skillId: skillId, // 用于颜色
       crystals: [],
     });
 
@@ -123,7 +125,7 @@ class SkillEffectRenderer {
   }
 
   // 创建黑洞效果
-  createBlackHole(x, y, radius, duration = 5000) {
+  createBlackHole(x, y, radius, duration = 5000, skillId = 'black_hole') {
     this.effects.push({
       x: x,
       y: y,
@@ -132,6 +134,7 @@ class SkillEffectRenderer {
       duration: duration,
       type: "black_hole",
       rotation: 0,
+      skillId: skillId, // 用于颜色
       particles: [],
     });
 
@@ -149,7 +152,15 @@ class SkillEffectRenderer {
   }
 
   // 创建旋风效果
-  createWhirlwind(x, y, radius, bladeCount, duration = 2000, player = null, skillId = 'death_whirlwind') {
+  createWhirlwind(
+    x,
+    y,
+    radius,
+    bladeCount,
+    duration = 2000,
+    player = null,
+    skillId = "death_whirlwind",
+  ) {
     this.effects.push({
       x: x,
       y: y,
@@ -165,15 +176,17 @@ class SkillEffectRenderer {
   }
 
   // 创建护盾效果
-  createShield(x, y, radius, color = "#ffd700") {
+  createShield(x, y, radius, skillId = 'holy_shield') {
+    const colors = SKILL_COLORS[skillId];
     this.effects.push({
       x: x,
       y: y,
       radius: radius,
-      color: color,
+      color: colors.primary,
       startTime: Date.now(),
       duration: 3000,
       type: "shield",
+      skillId: skillId, // 用于颜色
       alpha: 0.6,
     });
   }

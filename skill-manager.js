@@ -357,7 +357,7 @@ class SkillManager {
         bladeCount,
         2000,
         player, // 传入player引用
-        'death_whirlwind' // 传入skillId用于颜色
+        "death_whirlwind", // 传入skillId用于颜色
       );
     }
 
@@ -424,7 +424,7 @@ class SkillManager {
         targetY: targetY,
         damage: damage,
         type: "fireball",
-        skillId: 'hellfire_rain', // 用于颜色
+        skillId: "hellfire_rain", // 用于颜色
         speed: 5,
         range: range * 0.6,
       });
@@ -446,7 +446,7 @@ class SkillManager {
         radius: range,
         damage: damage,
         speed: 0.05,
-        skillId: 'blade_storm', // 用于颜色
+        skillId: "blade_storm", // 用于颜色
         lastHit: new Set(),
       });
     }
@@ -466,7 +466,7 @@ class SkillManager {
         target: target,
         damage: damage,
         type: "missile",
-        skillId: 'explosive_missiles', // 用于颜色
+        skillId: "explosive_missiles", // 用于颜色
         speed: 4,
         homing: true,
         explosionRadius: levelData.explosionRadius * CONFIG.TILE_SIZE || 100,
@@ -490,6 +490,7 @@ class SkillManager {
         player.y * CONFIG.TILE_SIZE,
         range,
         duration,
+        'black_hole' // 传入skillId用于颜色
       );
     }
 
@@ -522,7 +523,7 @@ class SkillManager {
       targetY: target.y * CONFIG.TILE_SIZE,
       damage: damage,
       type: "bullet",
-      skillId: 'sniper_shot', // 用于颜色
+      skillId: "sniper_shot", // 用于颜色
       speed: 15,
       pierce: levelData.pierce || 0,
       critChance: levelData.critChance || 0,
@@ -543,6 +544,7 @@ class SkillManager {
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range,
+        'frost_nova' // 传入skillId用于颜色
       );
     }
 
@@ -577,7 +579,7 @@ class SkillManager {
         player.y * CONFIG.TILE_SIZE,
         range,
         duration,
-        "#8b00ff",
+        'death_grasp' // 传入skillId用于颜色
       );
     }
 
@@ -608,7 +610,7 @@ class SkillManager {
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
         range,
-        "#ffd700",
+        'holy_shield' // 传入skillId用于颜色
       );
     }
 
@@ -663,7 +665,7 @@ class SkillManager {
         targetY: targetY,
         damage: damage,
         type: "star",
-        skillId: 'starfall', // 用于颜色
+        skillId: "starfall", // 用于颜色
         speed: 6,
         range: 80,
       });
@@ -690,10 +692,11 @@ class SkillManager {
 
     // 创建特效
     if (this.skillEffects) {
+      const colors = SKILL_COLORS.lucky_wheel;
       this.skillEffects.createExplosion(
         player.x * CONFIG.TILE_SIZE,
         player.y * CONFIG.TILE_SIZE,
-        "#ffff00",
+        colors.primary,
         15,
         4,
         2,
@@ -708,13 +711,14 @@ class SkillManager {
 
     // 创建分身特效
     if (this.skillEffects) {
+      const colors = SKILL_COLORS.mirror_clone;
       for (let i = 0; i < count; i++) {
         const angle = (Math.PI * 2 * i) / count;
         const dist = 100;
         const cloneX = player.x * CONFIG.TILE_SIZE + Math.cos(angle) * dist;
         const cloneY = player.y * CONFIG.TILE_SIZE + Math.sin(angle) * dist;
 
-        this.skillEffects.createExplosion(cloneX, cloneY, "#00ffff", 10, 3, 2);
+        this.skillEffects.createExplosion(cloneX, cloneY, colors.primary, 10, 3, 2);
       }
     }
 
@@ -735,10 +739,11 @@ class SkillManager {
         levelData.range * CONFIG.TILE_SIZE,
       );
       if (target) {
+        const colors = SKILL_COLORS.chain_explosion;
         this.skillEffects.createExplosion(
           target.x * CONFIG.TILE_SIZE,
           target.y * CONFIG.TILE_SIZE,
-          "#ff6600",
+          colors.primary,
           20,
           6,
           3,
