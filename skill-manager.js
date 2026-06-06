@@ -2,6 +2,8 @@
 // 技能管理系统 - 集成新技能系统到游戏
 // ============================================
 
+const SKILL_MANAGER_DEBUG = false;
+
 class SkillManager {
   constructor() {
     this.playerSkills = {}; // 玩家当前拥有的技能 {skillId: {level, data}}
@@ -65,6 +67,13 @@ class SkillManager {
       const skill = this.playerSkills[skillId];
       if (skill.level < 8) {
         skill.level++;
+        if (gameState && gameState.player) {
+          const playerSkill = gameState.player.skills.find((s) => s.id === skillId);
+          if (playerSkill) {
+            playerSkill.level = skill.level;
+            playerSkill.data = skill.data;
+          }
+        }
         return true;
       }
     }
@@ -120,7 +129,7 @@ class SkillManager {
 
     // 替换为进化技能
     delete this.playerSkills[skillId];
-    this.playerSkills[evolution.id] = {
+    const evolvedSkill = {
       level: 1,
       data: {
         id: evolution.id,
@@ -133,6 +142,27 @@ class SkillManager {
       lastUseTime: 0,
       evolved: true,
     };
+    this.playerSkills[evolution.id] = evolvedSkill;
+
+    if (gameState && gameState.player) {
+      const index = gameState.player.skills.findIndex((s) => s.id === skillId);
+      const playerSkill = {
+        id: evolution.id,
+        name: evolution.name,
+        icon: evolution.icon,
+        type: "evolved",
+        level: 1,
+        timer: 0,
+        data: evolvedSkill.data,
+        lastUseTime: 0,
+        evolved: true,
+      };
+      if (index >= 0) {
+        gameState.player.skills.splice(index, 1, playerSkill);
+      } else {
+        gameState.player.skills.push(playerSkill);
+      }
+    }
 
     return true;
   }
@@ -140,11 +170,11 @@ class SkillManager {
   // 更新所有技能（每帧调用）
   update(player, enemies) {
     if (!this.skillEffects) {
-      console.warn("skillManager: skillEffects未初始化");
+      if (SKILL_MANAGER_DEBUG) console.warn("skillManager: skillEffects未初始化");
       return;
     }
     if (!player || !player.skills) {
-      console.warn("skillManager: player或player.skills不存在");
+      if (SKILL_MANAGER_DEBUG) console.warn("skillManager: player或player.skills不存在");
       return;
     }
 
@@ -161,7 +191,7 @@ class SkillManager {
 
       const skillData = skill.data;
       if (!skillData) {
-        console.warn("skillManager: 技能", skill.id, "缺少data");
+        if (SKILL_MANAGER_DEBUG) console.warn("skillManager: 技能", skill.id, "缺少data");
         return;
       }
 
@@ -169,7 +199,7 @@ class SkillManager {
       const timeSinceLastUse = now - (skill.lastUseTime || 0);
 
       // 调试日志（只在首次或就绪时打印）
-      if (!skill._logged) {
+      if (SKILL_MANAGER_DEBUG && !skill._logged) {
         console.log(
           "skillManager: 技能",
           skill.id,
@@ -186,7 +216,7 @@ class SkillManager {
       }
 
       if (timeSinceLastUse >= cooldown) {
-        console.log("skillManager: 执行技能", skill.id, "等级", skill.level);
+        if (SKILL_MANAGER_DEBUG) console.log("skillManager: 执行技能", skill.id, "等级", skill.level);
         skill.lastUseTime = now;
         this.useSkill(skill, player, enemies);
       }
@@ -227,7 +257,7 @@ class SkillManager {
     const level = skill.level;
     const levelData = skillData.levels ? skillData.levels[level - 1] : null;
 
-    console.log(
+    if (SKILL_MANAGER_DEBUG) console.log(
       "useSkill: 技能=",
       skill.id,
       "等级=",
@@ -235,10 +265,10 @@ class SkillManager {
       "类型=",
       skillData.type,
     );
-    console.log("useSkill: levelData=", levelData);
+    if (SKILL_MANAGER_DEBUG) console.log("useSkill: levelData=", levelData);
 
     if (!levelData) {
-      console.warn(
+      if (SKILL_MANAGER_DEBUG) console.warn(
         "useSkill: 没有levelData，技能id=",
         skill.id,
         "等级=",
@@ -250,7 +280,7 @@ class SkillManager {
     const baseDamage = levelData.damage || skillData.baseDamage || 0;
     const finalDamage = this.calculateDamage(baseDamage, skillData.type);
 
-    console.log(
+    if (SKILL_MANAGER_DEBUG) console.log(
       "useSkill: baseDamage=",
       baseDamage,
       "finalDamage=",
@@ -259,7 +289,7 @@ class SkillManager {
 
     switch (skillData.type) {
       case "melee_aoe":
-        console.log("useSkill: 执行melee_aoe");
+        if (SKILL_MANAGER_DEBUG) console.log("useSkill: 执行melee_aoe");
         this.executeMeleeAOE(player, enemies, levelData, finalDamage);
         break;
       case "auto_aoe":

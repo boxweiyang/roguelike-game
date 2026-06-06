@@ -1063,9 +1063,17 @@ for (const tier of Object.values(TALENT_TREE)) {
   }
 }
 
+const EXTRACT_CONFIG = {
+  SPAWN_TIME: 120,
+  CHANNEL_TIME: 5,
+  RADIUS: 2.2,
+};
+const GAME_DEBUG = false;
+
 let gameState = {
   running: false,
   paused: false,
+  loopStarted: false,
   time: 0,
   player: null,
   playerStats: null,
@@ -1078,6 +1086,7 @@ let gameState = {
   xpOrbs: [],
   chests: [],
   searchPoints: [],
+  extractPoint: null,
   whirlwinds: [],
   particles: [],
   floatingTexts: [],
@@ -1092,6 +1101,7 @@ let gameState = {
   kills: 0,
   keys: {},
   levelUpChoices: [],
+  extractionRecorded: false,
   rerollCount: 0,
   inventoryOpen: false,
   merchantsShown: false,
@@ -1100,6 +1110,7 @@ let gameState = {
 let persistentData = {
   totalGold: 0,
   diamonds: 0, // 钻石货币
+  materials: { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 },
   inventorySize: 25, // 背包初始格数 (5x5)
   talentPoints: 0, // 可用的天赋点
   talents: {}, // 已解锁的天赋 {id: level}
@@ -1107,6 +1118,10 @@ let persistentData = {
   gamesPlayed: 0,
   totalKills: 0,
   totalExtractions: 0,
+  bossKills: 0,
+  totalEquipment: 0,
+  uniqueEquipment: [],
+  legendaryFound: 0,
   achievements: [], // 已完成的成就
   unlockedSkins: [
     "slash_default",
@@ -1316,11 +1331,40 @@ function loadGame() {
     const data = JSON.parse(saved);
     persistentData = { ...persistentData, ...data };
   }
+  if (!persistentData.materials) {
+    persistentData.materials = {
+      common: 0,
+      uncommon: 0,
+      rare: 0,
+      epic: 0,
+      legendary: 0,
+    };
+  }
+  if (!persistentData.uniqueEquipment) persistentData.uniqueEquipment = [];
+  if (!persistentData.bossKills) persistentData.bossKills = 0;
+  if (!persistentData.totalEquipment) persistentData.totalEquipment = 0;
+  if (!persistentData.legendaryFound) persistentData.legendaryFound = 0;
   initTalents();
 }
 
 function saveGame() {
   localStorage.setItem("abyss_v5", JSON.stringify(persistentData));
+}
+
+function addMaterials(materials = {}) {
+  if (!persistentData.materials) {
+    persistentData.materials = {
+      common: 0,
+      uncommon: 0,
+      rare: 0,
+      epic: 0,
+      legendary: 0,
+    };
+  }
+
+  for (const [type, count] of Object.entries(materials)) {
+    persistentData.materials[type] = (persistentData.materials[type] || 0) + count;
+  }
 }
 
 function initTalents() {
@@ -1523,10 +1567,32 @@ function initPlayer() {
     ], // 新系统：初始技能
     inventory: [],
     kills: 0,
+    wasHit: false,
   };
 
   // 应用装备加成
   updateEquipmentStats();
+}
+
+function syncSkillManagerFromPlayer() {
+  if (!skillManager || !gameState.player) return;
+
+  skillManager.playerSkills = {};
+  skillManager.passiveItems = {};
+
+  for (const skill of gameState.player.skills) {
+    const skillData = SKILLS_DATA[skill.id] || skill.data;
+    if (!skillData) continue;
+
+    skill.data = skillData;
+    skill.level = skill.level || 1;
+    skill.lastUseTime = 0;
+    skillManager.playerSkills[skill.id] = {
+      level: skill.level,
+      data: skillData,
+      lastUseTime: 0,
+    };
+  }
 }
 
 function updateEquipmentStats() {
@@ -1620,6 +1686,11 @@ function autoPickup() {
 
       // 更新任务进度 - 金币
       updateQuestProgress("daily_gold_500", val);
+    } else if (item.type === "xp") {
+      p.xp += item.value * (1 + stats.xpBonus);
+      addFloatingText(p.x, p.y, `+${Math.floor(item.value)}XP`, "#3498db");
+      checkLevelUp();
+      changed = true;
     } else if (item.type === "heal") {
       const healed = stats.heal(item.heal);
       if (healed > 0) {
@@ -1631,6 +1702,14 @@ function autoPickup() {
       if (p.inventory.length < (persistentData.inventorySize || 25)) {
         item.seen = false; // 标记为未查看
         p.inventory.push(item);
+        persistentData.totalEquipment = (persistentData.totalEquipment || 0) + 1;
+        if (!persistentData.uniqueEquipment) persistentData.uniqueEquipment = [];
+        if (!persistentData.uniqueEquipment.includes(item.equipment.id)) {
+          persistentData.uniqueEquipment.push(item.equipment.id);
+        }
+        if (item.equipment.rarity === "legendary") {
+          persistentData.legendaryFound = (persistentData.legendaryFound || 0) + 1;
+        }
         addLog(
           `获得装备: ${item.equipment.icon} ${item.equipment.name}`,
           "item",
@@ -1653,14 +1732,14 @@ function autoPickup() {
 // ============================================
 
 function equipItem(inventoryIndex) {
-  console.log("=== equipItem 调用 ===", inventoryIndex);
+  if (GAME_DEBUG) console.log("=== equipItem 调用 ===", inventoryIndex);
   const p = gameState.player;
   if (!p) {
-    console.log("玩家不存在");
+    if (GAME_DEBUG) console.log("玩家不存在");
     return;
   }
   if (!p.inventory[inventoryIndex]) {
-    console.log(
+    if (GAME_DEBUG) console.log(
       "索引",
       inventoryIndex,
       "不存在，当前库存:",
@@ -1670,20 +1749,20 @@ function equipItem(inventoryIndex) {
   }
 
   const item = p.inventory[inventoryIndex];
-  console.log("物品类型:", item.type, "物品数据:", item);
+  if (GAME_DEBUG) console.log("物品类型:", item.type, "物品数据:", item);
 
   if (item.type !== "equipment" || !item.equipment) {
-    console.log("不是装备或装备数据缺失");
+    if (GAME_DEBUG) console.log("不是装备或装备数据缺失");
     return;
   }
 
   const equip = item.equipment;
   const slot = equip.slot;
-  console.log("装备槽位:", slot, "装备:", equip.name);
+  if (GAME_DEBUG) console.log("装备槽位:", slot, "装备:", equip.name);
 
   // 如果该槽位已有装备，先卸下
   if (gameState.equipment[slot]) {
-    console.log("卸下现有装备:", gameState.equipment[slot].name);
+    if (GAME_DEBUG) console.log("卸下现有装备:", gameState.equipment[slot].name);
     p.inventory.push({
       type: "equipment",
       equipment: gameState.equipment[slot],
@@ -1695,7 +1774,7 @@ function equipItem(inventoryIndex) {
   }
 
   // 装备新物品
-  console.log("装备新物品到", slot);
+  if (GAME_DEBUG) console.log("装备新物品到", slot);
   gameState.equipment[slot] = equip;
   p.inventory.splice(inventoryIndex, 1);
 
@@ -1703,7 +1782,7 @@ function equipItem(inventoryIndex) {
   updateEquipmentStats();
 
   addLog(`装备 ${equip.icon} ${equip.name}`, "success");
-  console.log("装备成功，更新UI");
+  if (GAME_DEBUG) console.log("装备成功，更新UI");
   updateUI();
 }
 
@@ -1912,13 +1991,15 @@ function showLevelUpChoices() {
 }
 
 function selectUpgrade(card) {
-  console.log("=== selectUpgrade 调用 ===");
-  console.log("选择的卡牌:", card);
-  console.log("卡牌类型:", card.type, "ID:", card.id);
+  if (GAME_DEBUG) {
+    console.log("=== selectUpgrade 调用 ===");
+    console.log("选择的卡牌:", card);
+    console.log("卡牌类型:", card.type, "ID:", card.id);
+  }
 
   const p = gameState.player;
   if (!p) {
-    console.log("玩家不存在，退出");
+    if (GAME_DEBUG) console.log("玩家不存在，退出");
     document.getElementById("level-up-modal").classList.remove("show");
     gameState.paused = false;
     return;
@@ -1954,6 +2035,7 @@ function selectUpgrade(card) {
         const success = skillManager.addSkill(card.id);
         if (success) {
           addLog(`获得技能: ${card.icon} ${card.name}`, "success");
+          updateQuestProgress("daily_use_3_skills", 1);
         }
       }
     }
@@ -1978,7 +2060,7 @@ function selectUpgrade(card) {
     }
   } else {
     // 旧系统 - 属性强化
-    console.log("非技能卡牌，类型:", card.type);
+    if (GAME_DEBUG) console.log("非技能卡牌，类型:", card.type);
     if (card.effect && gameState.playerStats) {
       gameState.playerStats.applyStat(card.effect);
     }
@@ -1987,7 +2069,7 @@ function selectUpgrade(card) {
 
   document.getElementById("level-up-modal").classList.remove("show");
   gameState.paused = false;
-  console.log("升级完成，技能列表:", p.skills);
+  if (GAME_DEBUG) console.log("升级完成，技能列表:", p.skills);
   updateUI();
 }
 
@@ -2001,7 +2083,7 @@ function updateSkills(dt) {
   if (!p || !stats) return;
 
   // 首次调用时打印技能列表
-  if (!updateSkills.hasLogged) {
+  if (GAME_DEBUG && !updateSkills.hasLogged) {
     console.log(
       "玩家技能列表:",
       p.skills.map((s) => ({
@@ -2016,7 +2098,7 @@ function updateSkills(dt) {
   for (const skill of p.skills) {
     if (skill.cooldown === 0 || skill.type === "orbit") {
       // 只打印一次，避免刷屏
-      if (!updateSkills.skipLogged) {
+      if (GAME_DEBUG && !updateSkills.skipLogged) {
         console.log(
           "跳过技能 (cooldown=0 或 orbit):",
           skill.name,
@@ -2034,7 +2116,7 @@ function updateSkills(dt) {
     const actualCd = (skill.cooldown * Math.max(0.3, cdMult)) / asMult;
 
     if (skill.timer >= actualCd) {
-      console.log(
+      if (GAME_DEBUG) console.log(
         "技能就绪:",
         skill.name,
         "timer:",
@@ -2097,15 +2179,15 @@ updateSkills.skipLogged = false;
 
 function useSkill(skill, stats) {
   const p = gameState.player;
-  console.log("=== useSkill 调用 ===", skill.name, skill.type);
+  if (GAME_DEBUG) console.log("=== useSkill 调用 ===", skill.name, skill.type);
   const critChance = stats.criticalChance;
 
   switch (skill.type) {
     case "melee": {
-      console.log("近战技能:", skill.id, "范围:", skill.range);
+      if (GAME_DEBUG) console.log("近战技能:", skill.id, "范围:", skill.range);
       // 特殊处理旋风斩
       if (skill.id === "whirlwind") {
-        console.log("旋风斩触发! 范围:", skill.range, "伤害:", skill.damage);
+        if (GAME_DEBUG) console.log("旋风斩触发! 范围:", skill.range, "伤害:", skill.damage);
         // 对范围内所有敌人造成伤害
         for (const enemy of gameState.enemies) {
           if (dist(enemy.x, enemy.y, p.x, p.y) <= skill.range) {
@@ -2122,9 +2204,9 @@ function useSkill(skill, stats) {
           maxLife: 500,
           angle: 0,
         };
-        console.log("添加旋风特效:", whirlwindData);
+        if (GAME_DEBUG) console.log("添加旋风特效:", whirlwindData);
         gameState.whirlwinds.push(whirlwindData);
-        console.log("当前旋风数量:", gameState.whirlwinds.length);
+        if (GAME_DEBUG) console.log("当前旋风数量:", gameState.whirlwinds.length);
         spawnParticles(p.x, p.y, "#e74c3c", 15);
         spawnParticles(p.x, p.y, "#f39c12", 10);
       } else {
@@ -2302,6 +2384,10 @@ function killEnemy(enemy) {
   // 更新任务进度 - 击杀数
   updateQuestProgress("daily_kill_50", 1);
   updateQuestProgress("weekly_kill_500", 1);
+  if (enemy.isBoss) {
+    persistentData.bossKills = (persistentData.bossKills || 0) + 1;
+    updateQuestProgress("weekly_boss_3", 1);
+  }
 
   gameState.xpOrbs.push({
     x: enemy.x + randFloat(-0.3, 0.3),
@@ -2332,8 +2418,6 @@ function killEnemy(enemy) {
         "item",
       );
 
-      // 更新任务进度 - 装备收集
-      updateQuestProgress("daily_collect_5_equip", 1);
     }
   }
 
@@ -2552,6 +2636,99 @@ function spawnSearchPoint() {
   addLog("发现新的搜索点!", "info");
 }
 
+function spawnExtractPoint() {
+  if (gameState.extractPoint) return;
+
+  const p = gameState.player;
+  if (!p) return;
+
+  const margin = 4;
+  const side = rand(0, 3);
+  let x = p.x;
+  let y = p.y;
+
+  if (side === 0) {
+    x = rand(margin, CONFIG.ARENA_SIZE - margin);
+    y = margin;
+  } else if (side === 1) {
+    x = CONFIG.ARENA_SIZE - margin;
+    y = rand(margin, CONFIG.ARENA_SIZE - margin);
+  } else if (side === 2) {
+    x = rand(margin, CONFIG.ARENA_SIZE - margin);
+    y = CONFIG.ARENA_SIZE - margin;
+  } else {
+    x = margin;
+    y = rand(margin, CONFIG.ARENA_SIZE - margin);
+  }
+
+  gameState.extractPoint = {
+    x,
+    y,
+    radius: EXTRACT_CONFIG.RADIUS,
+    progress: 0,
+    active: false,
+  };
+
+  addLog("撤离点已开启，前往地图边缘完成撤离!", "success");
+}
+
+function updateExtractPoint(dt) {
+  const p = gameState.player;
+  if (!p) return;
+
+  if (!gameState.extractPoint && gameState.time >= EXTRACT_CONFIG.SPAWN_TIME) {
+    spawnExtractPoint();
+  }
+
+  const point = gameState.extractPoint;
+  const timer = document.getElementById("extract-timer");
+  if (!point) {
+    if (timer) timer.classList.add("hidden");
+    return;
+  }
+
+  const inRange = dist(p.x, p.y, point.x, point.y) <= point.radius;
+  if (inRange) {
+    if (!point.active) {
+      addLog("开始撤离，保持在撤离点内!", "success");
+    }
+    point.active = true;
+    point.progress = Math.min(EXTRACT_CONFIG.CHANNEL_TIME, point.progress + dt);
+  } else {
+    if (point.active) {
+      addLog("撤离中断", "warning");
+    }
+    point.active = false;
+    point.progress = 0;
+  }
+
+  if (timer) {
+    const remaining = Math.ceil(EXTRACT_CONFIG.CHANNEL_TIME - point.progress);
+    const countdown = document.getElementById("extract-countdown");
+    const bar = document.getElementById("extract-bar");
+    timer.classList.toggle("hidden", !point.active);
+    if (countdown) countdown.textContent = remaining;
+    if (bar) {
+      bar.style.width = `${(point.progress / EXTRACT_CONFIG.CHANNEL_TIME) * 100}%`;
+    }
+  }
+
+  if (point.progress >= EXTRACT_CONFIG.CHANNEL_TIME) {
+    completeExtraction();
+  }
+}
+
+function completeExtraction() {
+  if (!gameState.running || gameState.extractionRecorded) return;
+
+  gameState.extractionRecorded = true;
+  if (gameState.player) gameState.player.extracted = true;
+
+  updateQuestProgress("weekly_extraction_5", 1);
+  addLog("撤离成功!", "success");
+  gameOver(true);
+}
+
 function updateSearchPoints(dt) {
   const p = gameState.player;
   if (!p) return;
@@ -2683,12 +2860,14 @@ function openChest(chest) {
   if (statisticsSystem) {
     statisticsSystem.recordChestOpened();
   }
+  updateQuestProgress("daily_chest_3", 1);
 
   switch (chest.type) {
     case "gold":
       const gold = Math.floor(chest.value * (1 + stats.goldBonus));
       p.gold += gold;
       persistentData.totalGold += gold;
+      updateQuestProgress("daily_gold_500", gold);
       addFloatingText(chest.x, chest.y, `+${gold}💰`, "#f1c40f");
 
       // 记录金币统计
@@ -2708,6 +2887,7 @@ function openChest(chest) {
     case "rare":
       p.gold += chest.value;
       persistentData.totalGold += chest.value;
+      updateQuestProgress("daily_gold_500", chest.value);
       addFloatingText(chest.x, chest.y, `+${chest.value}💰`, "#f1c40f");
 
       // 记录金币统计
@@ -2807,6 +2987,7 @@ function updateEntities(dt) {
     if (d < 0.7) {
       const result = stats.takeDamage(enemy.atk);
       if (!result.isDodged && result.damage > 0) {
+        p.wasHit = true;
         // 荆棘伤害
         if (stats.thorns > 0) {
           enemy.hp -= stats.thorns;
@@ -3816,6 +3997,7 @@ function getTierUnlockReq(tierKey) {
 // ============================================
 
 function gameLoop(timestamp) {
+  gameState.loopStarted = true;
   if (!gameState.lastTime) gameState.lastTime = timestamp;
   const dt = Math.min((timestamp - gameState.lastTime) / 1000, 0.1);
   gameState.lastTime = timestamp;
@@ -3823,10 +4005,7 @@ function gameLoop(timestamp) {
   if (gameState.running && !gameState.paused) {
     gameState.time += dt;
 
-    // 更新任务进度 - 生存时间（每5秒更新一次）
-    if (Math.floor(gameState.time) % 5 === 0) {
-      updateQuestProgress("daily_survive_10min", dt);
-    }
+    updateQuestProgress("daily_survive_10min", dt);
 
     updatePlayer(dt);
 
@@ -3838,6 +4017,7 @@ function gameLoop(timestamp) {
     updateSkills(dt);
     updateEntities(dt);
     updateSearchPoints(dt);
+    updateExtractPoint(dt);
 
     // 更新特殊事件
     if (eventSystem) {
@@ -3882,7 +4062,7 @@ function gameLoop(timestamp) {
   }
 
   render(gameState); // 使用新的渲染系统
-  requestAnimationFrame(gameLoop);
+  gameState.animationFrameId = requestAnimationFrame(gameLoop);
 }
 
 // ============================================
@@ -3926,6 +4106,8 @@ document.addEventListener("keyup", (e) => {
 function startGame() {
   document.getElementById("start-screen").classList.add("hidden");
   document.getElementById("death-screen").classList.add("hidden");
+  const loopStarted = gameState.loopStarted || false;
+  const animationFrameId = gameState.animationFrameId || null;
 
   // 初始化渲染系统（重要！）
   initRender();
@@ -3963,6 +4145,8 @@ function startGame() {
   gameState = {
     running: true,
     paused: false,
+    loopStarted,
+    animationFrameId,
     time: 0,
     player: null,
     playerStats: null,
@@ -3975,6 +4159,7 @@ function startGame() {
     xpOrbs: [],
     chests: [],
     searchPoints: [],
+    extractPoint: null,
     whirlwinds: [],
     particles: [],
     floatingTexts: [],
@@ -3989,6 +4174,7 @@ function startGame() {
     kills: 0,
     keys: {},
     levelUpChoices: [],
+    extractionRecorded: false,
     inventoryOpen: false,
     shopOpen: false,
     diamondShopOpen: false,
@@ -3996,10 +4182,17 @@ function startGame() {
   };
 
   document.getElementById("log-content").innerHTML = "";
+  const extractTimer = document.getElementById("extract-timer");
+  const extractBar = document.getElementById("extract-bar");
+  if (extractTimer) extractTimer.classList.add("hidden");
+  if (extractBar) extractBar.style.width = "0%";
   initPlayer();
+  syncSkillManagerFromPlayer();
   spawnChest();
 
-  requestAnimationFrame(gameLoop);
+  if (!gameState.loopStarted) {
+    gameState.animationFrameId = requestAnimationFrame(gameLoop);
+  }
   addLog("欢迎来到深渊撤离区 v7.0 - 割草体验重制版!", "info");
   addLog("WASD移动, 自动攻击", "info");
   addLog("消灭敌人获取经验、金币和装备", "info");
@@ -4008,19 +4201,29 @@ function startGame() {
   addLog("右上角📖按钮查看技能图鉴", "info");
 }
 
-function gameOver() {
+function gameOver(extracted = gameState.player?.extracted || false) {
+  if (!gameState.running) return;
   gameState.running = false;
+  if (gameState.player) gameState.player.extracted = extracted;
 
   // 更新统计数据
   persistentData.totalKills += gameState.kills;
   persistentData.gamesPlayed++;
+  updateQuestProgress("weekly_play_10", 1);
+  if (extracted && !gameState.extractionRecorded) {
+    gameState.extractionRecorded = true;
+    persistentData.totalExtractions++;
+    updateQuestProgress("weekly_extraction_5", 1);
+  } else if (extracted && gameState.extractionRecorded) {
+    persistentData.totalExtractions++;
+  }
   persistentData.totalPlayTime =
     (persistentData.totalPlayTime || 0) + gameState.time;
   persistentData.runStats = {
     timeAlive: gameState.time,
     kills: gameState.kills,
     level: gameState.player.level,
-    extracted: false,
+    extracted,
   };
 
   // 更新最高记录
@@ -4036,7 +4239,7 @@ function gameOver() {
   earnedPoints += Math.floor(gameState.time / 25); // 每25秒1点（原30秒，提升20%）
   earnedPoints += Math.floor(gameState.kills / 40); // 每40杀1点（原50杀，提升25%）
   earnedPoints += Math.floor(gameState.player.level / 4); // 每4级1点（原5级，提升25%）
-  earnedPoints += gameState.player.extracted ? 10 : 0; // 撤离成功额外+10点
+  earnedPoints += extracted ? 10 : 0; // 撤离成功额外+10点
 
   persistentData.talentPoints += earnedPoints;
 
@@ -4048,12 +4251,14 @@ function gameOver() {
 
   // 记录游戏结束统计
   if (statisticsSystem) {
-    statisticsSystem.onGameEnd(gameState.player.extracted);
+    statisticsSystem.onGameEnd(extracted);
   }
 
   saveGame();
 
   document.getElementById("death-screen").classList.remove("hidden");
+  const deathTitle = document.querySelector("#death-screen .screen-title");
+  if (deathTitle) deathTitle.textContent = extracted ? "撤离成功" : "任务失败";
   document.getElementById("death-stats").innerHTML = `
         <p>存活: ${formatTime(gameState.time)} | 等级: ${gameState.player.level}</p>
         <p>击杀: ${gameState.kills}</p>
@@ -4066,7 +4271,7 @@ function gameOver() {
   // 显示评级
   if (comboSystem) {
     setTimeout(() => {
-      comboSystem.showRating(gameState.player.extracted);
+      comboSystem.showRating(extracted);
     }, 500);
   }
 }
@@ -4445,13 +4650,21 @@ function updateQuestProgress(questId, amount = 1) {
     persistentData.weeklyQuestProgress = {};
   }
 
+  const quest =
+    DAILY_QUESTS.find((q) => q.id === questId) ||
+    WEEKLY_QUESTS.find((q) => q.id === questId);
+  const target = quest ? quest.target : Infinity;
+
   // 检查每日任务
   const dailyQuests = getDailyQuests();
   if (dailyQuests.includes(questId)) {
     if (!persistentData.dailyQuestProgress[questId]) {
       persistentData.dailyQuestProgress[questId] = 0;
     }
-    persistentData.dailyQuestProgress[questId] += amount;
+    persistentData.dailyQuestProgress[questId] = Math.min(
+      target,
+      persistentData.dailyQuestProgress[questId] + amount,
+    );
   }
 
   // 检查每周任务
@@ -4460,7 +4673,10 @@ function updateQuestProgress(questId, amount = 1) {
     if (!persistentData.weeklyQuestProgress[questId]) {
       persistentData.weeklyQuestProgress[questId] = 0;
     }
-    persistentData.weeklyQuestProgress[questId] += amount;
+    persistentData.weeklyQuestProgress[questId] = Math.min(
+      target,
+      persistentData.weeklyQuestProgress[questId] + amount,
+    );
   }
 }
 
@@ -4507,7 +4723,12 @@ function claimQuestReward(questId) {
     if (p) {
       p.gold += quest.reward.gold;
       persistentData.totalGold += quest.reward.gold;
+      updateQuestProgress("daily_gold_500", quest.reward.gold);
     }
+  }
+
+  if (quest.reward.materials) {
+    addMaterials(quest.reward.materials);
   }
 
   // 标记为已领取
@@ -4692,7 +4913,6 @@ function sellItem(index, price) {
   if (!p || !p.inventory[index]) return;
 
   p.gold += price;
-  persistentData.totalGold += price;
   p.inventory.splice(index, 1);
 
   addLog(`出售物品，获得 ${price} 金币`, "success");
@@ -4949,7 +5169,6 @@ function buyShopProduct(index) {
   if (!product || !p || p.gold < product.price) return;
 
   p.gold -= product.price;
-  persistentData.totalGold += product.price;
 
   // 应用购买效果
   if (product.type === "skill") {
@@ -4968,6 +5187,7 @@ function buyShopProduct(index) {
       if (skill) {
         p.skills.push({ ...skill, level: 1, timer: 0 });
         addLog(`购买技能: ${skill.icon} ${skill.name}`, "success");
+        updateQuestProgress("daily_use_3_skills", 1);
       }
     }
   } else if (product.type === "attr") {

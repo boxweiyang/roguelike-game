@@ -9,6 +9,7 @@ let gameCtx = null;
 let minimapCanvas = null;
 let minimapCtx = null;
 let neonRenderer = null; // 霓虹渲染器
+const RENDER_DEBUG = false;
 
 // 初始化Canvas
 function initRender() {
@@ -22,20 +23,17 @@ function initRender() {
 
 // 主渲染函数
 function render(gameState) {
-  console.log("renderer.render() 被调用");
   if (!gameCtx) {
-    console.warn("renderer: gameCtx未初始化!");
+    if (RENDER_DEBUG) console.warn("renderer: gameCtx未初始化!");
     return;
   }
 
   const ctx = gameCtx;
   const p = gameState.player;
   if (!p) {
-    console.warn("renderer: player不存在!");
+    if (RENDER_DEBUG) console.warn("renderer: player不存在!");
     return;
   }
-
-  console.log("renderer: 开始渲染, player.x=", p.x, "player.y=", p.y);
 
   // 清屏
   ctx.fillStyle = "#0d0d0d";
@@ -50,6 +48,7 @@ function render(gameState) {
 
   // 渲染各层
   renderGrid(ctx);
+  renderExtractPoint(ctx, gameState.extractPoint);
   renderSearchPoints(ctx, gameState.searchPoints);
   renderChests(ctx, gameState.chests);
   renderGroundItems(ctx, gameState.groundItems);
@@ -64,16 +63,9 @@ function render(gameState) {
   renderFloatingTexts(ctx, gameState.floatingTexts);
 
   // 渲染技能特效（在摄像机坐标系内）
-  console.log("renderer: 检查skillManager");
   if (skillManager && skillManager.skillEffects) {
-    console.log("renderer: 准备渲染技能特效");
-    console.log("  - camX=", camX, "camY=", camY);
-    console.log("  - player.x=", p.x, "player.y=", p.y);
-    console.log("  - effects数量=", skillManager.skillEffects.effects.length);
-    console.log("renderer: 调用skillManager.skillEffects.render()");
     skillManager.skillEffects.render(ctx);
-    console.log("renderer: skillManager.skillEffects.render() 调用完成");
-  } else {
+  } else if (RENDER_DEBUG) {
     console.warn("renderer: skillManager或skillEffects不存在");
     console.log("  - skillManager=", skillManager);
     console.log(
@@ -86,6 +78,44 @@ function render(gameState) {
 
   // 渲染小地图
   renderMinimap(gameState);
+}
+
+function renderExtractPoint(ctx, extractPoint) {
+  if (!extractPoint) return;
+
+  const x = extractPoint.x * CONFIG.TILE_SIZE;
+  const y = extractPoint.y * CONFIG.TILE_SIZE;
+  const radius = extractPoint.radius * CONFIG.TILE_SIZE;
+  const pulse = Math.sin(Date.now() / 180) * 0.15 + 0.85;
+
+  ctx.fillStyle = `rgba(46, 204, 113, ${0.15 * pulse})`;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = extractPoint.active ? "#2ecc71" : "#00d4ff";
+  ctx.lineWidth = extractPoint.active ? 4 : 3;
+  ctx.setLineDash(extractPoint.active ? [] : [8, 6]);
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = "#2ecc71";
+  ctx.font = "30px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("🚁", x, y);
+
+  if (extractPoint.active) {
+    const progress = extractPoint.progress / EXTRACT_CONFIG.CHANNEL_TIME;
+    const barWidth = 56;
+    const barHeight = 5;
+    ctx.fillStyle = "#333";
+    ctx.fillRect(x - barWidth / 2, y - radius - 12, barWidth, barHeight);
+    ctx.fillStyle = "#2ecc71";
+    ctx.fillRect(x - barWidth / 2, y - radius - 12, barWidth * progress, barHeight);
+  }
 }
 
 // 渲染网格
@@ -497,6 +527,7 @@ function renderGroundItems(ctx, groundItems) {
 
     let icon = "📦";
     if (item.type === "gold") icon = "💰";
+    else if (item.type === "xp") icon = "🔷";
     else if (item.type === "heal") icon = "❤️";
     else if (item.type === "equipment") icon = item.icon || "🎒";
 
@@ -584,6 +615,13 @@ function renderMinimap(gameState) {
     const x = chest.x * scale;
     const y = chest.y * scale;
     ctx.fillRect(x - 1, y - 1, 3, 3);
+  }
+
+  if (gameState.extractPoint) {
+    ctx.fillStyle = "#2ecc71";
+    const x = gameState.extractPoint.x * scale;
+    const y = gameState.extractPoint.y * scale;
+    ctx.fillRect(x - 2, y - 2, 5, 5);
   }
 }
 

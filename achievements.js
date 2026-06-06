@@ -85,11 +85,23 @@ function checkAchievements() {
 
 // 获取成就统计
 function getAchievementStats() {
+    const p = typeof gameState !== 'undefined' ? gameState.player : null;
+    const runKills = typeof gameState !== 'undefined' ? gameState.kills || 0 : 0;
+    const runTime = typeof gameState !== 'undefined' ? gameState.time || 0 : 0;
+
     return {
         totalKills: persistentData.totalKills || 0,
         totalExtractions: persistentData.totalExtractions || 0,
+        bossKills: persistentData.bossKills || 0,
         totalGold: persistentData.totalGold || 0,
         totalPlayTime: persistentData.totalPlayTime || 0,
+        totalEquipment: persistentData.totalEquipment || 0,
+        uniqueEquipment: (persistentData.uniqueEquipment || []).length,
+        legendaryFound: persistentData.legendaryFound || 0,
+        singleRunKills: runKills,
+        fastKills: runTime <= 180 ? runKills : 0,
+        allSkillsInRun: p && p.skills && p.skills.length >= Object.keys(SKILLS_DATA || {}).length ? 1 : 0,
+        noHitExtraction: p && p.extracted && !p.wasHit ? 1 : 0,
         maxLevel: persistentData.highScoreLevel || 0,
         maxSurvivalTime: persistentData.maxSurvivalTime || 0,
         achievementCount: (persistentData.achievements || []).length
@@ -105,6 +117,7 @@ function getDailyQuests() {
         persistentData.dailyQuestDate = today;
         persistentData.currentDailyQuests = [];
         persistentData.dailyQuestProgress = {};
+        persistentData.dailyQuestClaimed = [];
         
         const shuffled = [...DAILY_QUESTS].sort(() => Math.random() - 0.5);
         persistentData.currentDailyQuests = shuffled.slice(0, 3).map(q => q.id);
@@ -121,6 +134,7 @@ function getWeeklyQuests() {
         persistentData.weeklyQuestDate = weekStart;
         persistentData.currentWeeklyQuests = [];
         persistentData.weeklyQuestProgress = {};
+        persistentData.weeklyQuestClaimed = [];
         
         const shuffled = [...WEEKLY_QUESTS].sort(() => Math.random() - 0.5);
         persistentData.currentWeeklyQuests = shuffled.slice(0, 3).map(q => q.id);
